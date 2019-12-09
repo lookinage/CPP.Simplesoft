@@ -8,6 +8,8 @@ namespace Simplesoft
 
 		public:
 
+		Exception(Exception&&) = delete;
+		Exception(Exception&) = delete;
 		Exception(const char* message);
 
 		const char* GetMessage() const;

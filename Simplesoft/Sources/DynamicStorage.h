@@ -5,16 +5,15 @@
 namespace Simplesoft
 {
 	template<typename T>
-	class DynamicRow
+	class DynamicStorage
 	{
 		T* _data;
 
 		public:
 
-		DynamicRow(DynamicRow&&) = delete;
-		DynamicRow(DynamicRow&) = delete;
-		DynamicRow() = delete;
-		DynamicRow(__int64 count) : _data((T*)new char[sizeof(__int64) + sizeof(T) * count])
+		DynamicStorage(DynamicStorage&&) = delete;
+		DynamicStorage(DynamicStorage&) = delete;
+		DynamicStorage(__int64 count) : _data((T*)new char[sizeof(__int64) + sizeof(T) * count])
 		{
 			*(__int64*)_data = count;
 			_data = (T*)((char*)_data + sizeof(__int64));
@@ -24,10 +23,11 @@ namespace Simplesoft
 
 		T& operator[](__int64 index)
 		{
-#if Debug
+			#if _DEBUG
 			if (index < 0x0 || index >= GetCount())
-				throw Exception("index is invalid.");
-#endif
+				throw new Exception("index is invalid.");
+			#endif
+
 			return _data[index];
 		}
 	};
