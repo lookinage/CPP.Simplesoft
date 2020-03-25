@@ -1,34 +1,74 @@
 #pragma once
 
-#include "Exception.h"
+#include <string>
 
-namespace Simplesoft
+template<typename T>
+class DynamicStorage
 {
-	template<typename T>
-	class DynamicStorage
+	Integer _count;
+	T* _data;
+
+	public:
+
+	DynamicStorage(DynamicStorage&&) = delete;
+	DynamicStorage(DynamicStorage&) = delete;
+	DynamicStorage(const Integer count) : _count(count), _data(new T[count])
 	{
-		T* _data;
+	}
+	~DynamicStorage()
+	{
+		delete _data;
+	}
 
-		public:
+	Integer GetCount() const
+	{
+		return _count;
+	}
 
-		DynamicStorage(DynamicStorage&&) = delete;
-		DynamicStorage(DynamicStorage&) = delete;
-		DynamicStorage(__int64 count) : _data((T*)new char[sizeof(__int64) + sizeof(T) * count])
+	void EnsureCount(const Integer desiredCount)
+	{
+		Integer newCount;
+		T* newData;
+
+		if (desiredCount <= _count)
+			return;
+		newCount = _count;
+		do
 		{
-			*(__int64*)_data = count;
-			_data = (T*)((char*)_data + sizeof(__int64));
+			newCount <<= 0x1LL;
+			if (newCount < 0x0LL)
+			{
+				newCount = 0x7FFFFFFFFFFFFFFFLL;
+				break;
+			}
 		}
+		while (newCount < desiredCount);
+		newData = new T[newCount];
+		memcpy(newData, _data, _count * sizeof(T));
+		_count = newCount;
+		delete _data;
+		_data = newData;
+		return;
+	}
 
-		__int64 GetCount() { return *((__int64*)_data - 0x1); }
+	T& operator[](const Integer index) const
+	{
+		return _data[index];
+	}
 
-		T& operator[](__int64 index)
-		{
-			#if _DEBUG
-			if (index < 0x0 || index >= GetCount())
-				throw new Exception("index is invalid.");
-			#endif
+	template<typename T>
+	friend bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right);
+	template<typename T>
+	friend bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right);
+};
 
-			return _data[index];
-		}
-	};
-}
+template<typename T>
+inline bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right)
+{
+	return left._data == right._data;
+};
+template<typename T>
+inline bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right)
+{
+	return left._data != right._data;
+};

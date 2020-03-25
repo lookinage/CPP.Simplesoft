@@ -1,26 +1,30 @@
 #pragma once
 
-#include "Exception.h"
-
-namespace Simplesoft
+template<typename T, Integer Count>
+class StaticStorage
 {
-	template<typename T, __int64 Count>
-	class StaticStorage
+	T _data[Count];
+
+	public:
+
+	const Integer GetCount() const
 	{
-		T _array[Count];
+		return Count;
+	}
 
-		public:
+	inline T& operator[](const Integer index)
+	{
+		return _data[index];
+	}
+};
 
-		__int64 const GetCount() const { return Count; }
-
-		T& operator[](__int64 index)
-		{
-			#if _DEBUG
-			if (index < 0x0 || index >= Count)
-				throw new Exception("index is invalid");
-			#endif
-
-			return _array[index];
-		}
-	};
-}
+template<typename T, Integer Count>
+inline bool operator==(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+{
+	return memcmp(&left, &right, sizeof(T) * Count) == 0x0;
+};
+template<typename T, Integer Count>
+inline bool operator!=(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+{
+	return memcmp(&left, &right, sizeof(T) * Count) != 0x0;
+};
