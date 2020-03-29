@@ -124,9 +124,12 @@ class Stack
 		element = _storage[--_count];
 		return true;
 	}
-	void Add(T& element)
+	void Add(T element)
 	{
-		_storage[_count++] = element;
+		Integer offset;
+
+		_storage.EnsureCount(_count = (offset = _count) + 0x1LL);
+		_storage[offset] = element;
 	}
 	Integer GetCount()
 	{

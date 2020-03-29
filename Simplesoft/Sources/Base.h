@@ -6,6 +6,8 @@ typedef __int64 Integer;
 template<typename T>
 __int64 Collapse(T& value)
 {
+	__int64 result;
+
 	if (sizeof(T) == 0x1LL)
 		return *(__int8*)&value;
 	if (sizeof(T) == 0x2LL)
@@ -28,7 +30,7 @@ __int64 Collapse(T& value)
 		return *(__int64*)&value ^ *((__int64*)&value + 0x1LL) ^ *((__int64*)&value + 0x2LL) ^ *((__int64*)&value + 0x3LL) ^ *((__int64*)&value + 0x4LL) ^ *((__int64*)&value + 0x5LL) ^ *((__int64*)&value + 0x6LL);
 	if (sizeof(T) == 0x40LL)
 		return *(__int64*)&value ^ *((__int64*)&value + 0x1LL) ^ *((__int64*)&value + 0x2LL) ^ *((__int64*)&value + 0x3LL) ^ *((__int64*)&value + 0x4LL) ^ *((__int64*)&value + 0x5LL) ^ *((__int64*)&value + 0x6LL) ^ *((__int64*)&value + 0x7LL);
-	__int64 result = 0x0LL;
+	result = 0x0LL;
 	for (__int64 offset = 0x0; offset != sizeof(T); offset += 0x8LL)
 		result ^= *(__int64*)((__int8*)&value + offset);
 	return result;

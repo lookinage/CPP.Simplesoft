@@ -2,6 +2,7 @@
 #include <Base.h>
 #include <StaticStorage.h>
 #include <DynamicStorage.h>
+#include <Stack.h>
 
 struct A
 {
@@ -11,7 +12,14 @@ struct A
 
 __int32 main()
 {
-	__int32 v = sizeof(A);
+	Stack<int> stack;
+	int v = stack[0];
+	stack.Add(1);
+	v = stack[0];
+
+	stack[0] = 3;
+	v = stack[0];
+
 	StaticStorage<__int32, 0x3LL> staticStorage = StaticStorage<__int32, 0x3LL>();
 	std::cout << staticStorage.GetCount() << std::endl;
 	std::cout << staticStorage[0x0LL] << std::endl;

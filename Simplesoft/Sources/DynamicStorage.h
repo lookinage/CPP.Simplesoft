@@ -30,17 +30,22 @@ class DynamicStorage
 
 		if (count <= _count)
 			return;
-		newCount = _count;
-		do
+		if (_count != 0x0LL)
 		{
-			newCount <<= 0x1LL;
-			if (newCount < 0x0LL)
+			newCount = _count;
+			do
 			{
-				newCount = 0x7FFFFFFFFFFFFFFFLL;
-				break;
+				newCount <<= 0x1LL;
+				if (newCount < 0x0LL)
+				{
+					newCount = 0x7FFFFFFFFFFFFFFFLL;
+					break;
+				}
 			}
+			while (newCount < count);
 		}
-		while (newCount < count);
+		else
+			newCount = 0x1LL;
 		newData = new T[newCount];
 		memcpy(newData, _data, _count * sizeof(T));
 		_count = newCount;
