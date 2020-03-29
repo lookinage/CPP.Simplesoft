@@ -10,9 +10,7 @@ class DynamicStorage
 
 	public:
 
-	DynamicStorage(DynamicStorage&&) = delete;
-	DynamicStorage(DynamicStorage&) = delete;
-	DynamicStorage(const Integer count) : _count(count), _data(new T[count])
+	explicit DynamicStorage(const Integer count) : _count(count), _data(new T[count])
 	{
 	}
 	~DynamicStorage()
@@ -25,12 +23,12 @@ class DynamicStorage
 		return _count;
 	}
 
-	void EnsureCount(const Integer desiredCount)
+	void EnsureCount(const Integer count)
 	{
 		Integer newCount;
 		T* newData;
 
-		if (desiredCount <= _count)
+		if (count <= _count)
 			return;
 		newCount = _count;
 		do
@@ -42,7 +40,7 @@ class DynamicStorage
 				break;
 			}
 		}
-		while (newCount < desiredCount);
+		while (newCount < count);
 		newData = new T[newCount];
 		memcpy(newData, _data, _count * sizeof(T));
 		_count = newCount;
@@ -51,9 +49,9 @@ class DynamicStorage
 		return;
 	}
 
-	T& operator[](const Integer index) const
+	T& operator[](const Integer offset) const
 	{
-		return _data[index];
+		return _data[offset];
 	}
 
 	template<typename T>
@@ -63,12 +61,12 @@ class DynamicStorage
 };
 
 template<typename T>
-inline bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right)
+bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right)
 {
 	return left._data == right._data;
 };
 template<typename T>
-inline bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right)
+bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right)
 {
 	return left._data != right._data;
 };

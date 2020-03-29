@@ -1,8 +1,10 @@
 #pragma once
 
 template<typename T, Integer Count>
-class StaticStorage
+struct StaticStorage
 {
+	private:
+
 	T _data[Count];
 
 	public:
@@ -12,19 +14,19 @@ class StaticStorage
 		return Count;
 	}
 
-	inline T& operator[](const Integer index)
+	T& operator[](const Integer offset)
 	{
-		return _data[index];
+		return _data[offset];
 	}
 };
 
 template<typename T, Integer Count>
-inline bool operator==(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+bool operator==(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
 {
 	return memcmp(&left, &right, sizeof(T) * Count) == 0x0;
 };
 template<typename T, Integer Count>
-inline bool operator!=(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+bool operator!=(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
 {
 	return memcmp(&left, &right, sizeof(T) * Count) != 0x0;
 };
