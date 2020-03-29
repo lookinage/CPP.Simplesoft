@@ -16,7 +16,7 @@ class Stack
 		Integer _offset;
 		Integer _edge;
 
-		explicit AscendingSequence(Stack* stack, Integer offset, Integer edge) : _stack(stack), _offset(offset), _edge(edge) { }
+		explicit AscendingSequence(Stack* const stack, Integer const offset, Integer const edge) : _stack(stack), _offset(offset), _edge(edge) { }
 
 		public:
 
@@ -27,7 +27,7 @@ class Stack
 			DynamicStorage<T> _storage;
 			Integer _offset;
 
-			explicit Enumerator(DynamicStorage<T> storage, Integer offset) : _storage(storage), _offset(offset) { }
+			explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
 
 			public:
 
@@ -36,11 +36,11 @@ class Stack
 				_offset++;
 				return *this;
 			}
-			bool operator==(Enumerator other) const
+			bool operator==(Enumerator const other) const
 			{
 				return _offset == other._offset;
 			}
-			bool operator!=(Enumerator other) const
+			bool operator!=(Enumerator const other) const
 			{
 				return _offset != other._offset;
 			}
@@ -63,7 +63,7 @@ class Stack
 		Integer _offset;
 		Integer _edge;
 
-		explicit DescendingSequence(Stack* stack, Integer offset, Integer edge) : _stack(stack), _offset(offset), _edge(edge) { }
+		explicit DescendingSequence(Stack* const stack, Integer const offset, Integer const edge) : _stack(stack), _offset(offset), _edge(edge) { }
 
 		public:
 
@@ -74,7 +74,7 @@ class Stack
 			DynamicStorage<T> _storage;
 			Integer _offset;
 
-			explicit Enumerator(DynamicStorage<T> storage, Integer offset) : _storage(storage), _offset(offset) { }
+			explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
 
 			public:
 
@@ -83,11 +83,11 @@ class Stack
 				_offset--;
 				return *this;
 			}
-			bool operator==(Enumerator other) const
+			bool operator==(Enumerator const other) const
 			{
 				return _offset == other._offset;
 			}
-			bool operator!=(Enumerator other) const
+			bool operator!=(Enumerator const other) const
 			{
 				return _offset != other._offset;
 			}
@@ -102,11 +102,11 @@ class Stack
 	};
 
 	DynamicStorage<T> _storage;
-	int _count;
+	__int32 _count;
 
 	public:
 
-	explicit Stack(const Integer capacity) : _storage(capacity), _count(0x0LL)
+	explicit Stack(Integer const capacity) : _storage(capacity), _count(0x0LL)
 	{
 	}
 	explicit Stack() : Stack(0x0LL)
@@ -117,14 +117,14 @@ class Stack
 	{
 		_count = 0x0LL;
 	}
-	bool Remove(T& element)
+	bool Remove(T& const element)
 	{
 		if (_count == 0x0LL)
 			return false;
 		element = _storage[--_count];
 		return true;
 	}
-	void Add(T element)
+	void Add(T const element)
 	{
 		Integer offset;
 
@@ -135,7 +135,7 @@ class Stack
 	{
 		return _count;
 	}
-	AscendingSequence GetAscendingSequence(Integer offset, Integer edge)
+	AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge)
 	{
 		return AscendingSequence(this, offset, edge);
 	}
@@ -143,7 +143,7 @@ class Stack
 	{
 		return GetAscendingSequence(0x0LL, _count);
 	}
-	AscendingSequence GetDescendingSequence(Integer offset, Integer edge)
+	AscendingSequence GetDescendingSequence(Integer const offset, Integer const edge)
 	{
 		return AscendingSequence(this, offset, edge);
 	}
@@ -152,7 +152,7 @@ class Stack
 		return GetDescendingSequence(_count - 0x1LL, -0x1LL);
 	}
 
-	T& operator[](const Integer index) const
+	T& operator[](Integer const index) const
 	{
 		return _storage[index];
 	}

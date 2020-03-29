@@ -23,7 +23,7 @@ class DynamicStorage
 		return _count;
 	}
 
-	void EnsureCount(const Integer count)
+	void EnsureCount(Integer const count)
 	{
 		Integer newCount;
 		T* newData;
@@ -54,24 +54,24 @@ class DynamicStorage
 		return;
 	}
 
-	T& operator[](const Integer offset) const
+	T& operator[](Integer const offset) const
 	{
 		return _data[offset];
 	}
 
 	template<typename T>
-	friend bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right);
+	friend bool operator==(DynamicStorage<T>& const left, DynamicStorage<T>& const right);
 	template<typename T>
-	friend bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right);
+	friend bool operator!=(DynamicStorage<T>& const left, DynamicStorage<T>& const right);
 };
 
 template<typename T>
-bool operator==(DynamicStorage<T>& left, DynamicStorage<T>& right)
+bool operator==(DynamicStorage<T>& const left, DynamicStorage<T>& const right)
 {
 	return left._data == right._data;
 };
 template<typename T>
-bool operator!=(DynamicStorage<T>& left, DynamicStorage<T>& right)
+bool operator!=(DynamicStorage<T>& const left, DynamicStorage<T>& const right)
 {
 	return left._data != right._data;
 };

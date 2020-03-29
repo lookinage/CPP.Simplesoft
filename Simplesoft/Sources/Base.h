@@ -4,7 +4,7 @@ typedef __int8 Byte;
 typedef __int64 Integer;
 
 template<typename T>
-__int64 Collapse(T& value)
+__int64 Collapse(T& const value)
 {
 	__int64 result;
 

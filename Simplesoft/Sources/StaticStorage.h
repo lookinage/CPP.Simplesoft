@@ -14,19 +14,19 @@ struct StaticStorage
 		return Count;
 	}
 
-	T& operator[](const Integer offset)
+	T& operator[](Integer const offset)
 	{
 		return _data[offset];
 	}
 };
 
 template<typename T, Integer Count>
-bool operator==(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+bool operator==(StaticStorage<T, Count>& const left, StaticStorage<T, Count>& const right)
 {
 	return memcmp(&left, &right, sizeof(T) * Count) == 0x0;
 };
 template<typename T, Integer Count>
-bool operator!=(StaticStorage<T, Count>& left, StaticStorage<T, Count>& right)
+bool operator!=(StaticStorage<T, Count>& const left, StaticStorage<T, Count>& const right)
 {
 	return memcmp(&left, &right, sizeof(T) * Count) != 0x0;
 };
