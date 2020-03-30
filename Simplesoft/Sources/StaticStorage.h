@@ -13,6 +13,14 @@ struct StaticStorage
 	{
 		return Count;
 	}
+	T Get(Integer const offset)
+	{
+		return _data[offset];
+	}
+	void Set(Integer const offset, T const value)
+	{
+		_data[offset] = value;
+	}
 
 	T& operator[](Integer const offset)
 	{

@@ -12,11 +12,11 @@ class Stack
 
 		private:
 
-		Stack* _stack;
+		const Stack* const _stack;
+		Integer const _edge;
 		Integer _offset;
-		Integer _edge;
 
-		explicit AscendingSequence(Stack* const stack, Integer const offset, Integer const edge) : _stack(stack), _offset(offset), _edge(edge) { }
+		explicit AscendingSequence(const Stack* const stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
 
 		public:
 
@@ -24,7 +24,7 @@ class Stack
 		{
 			friend struct AscendingSequence;
 
-			DynamicStorage<T> _storage;
+			DynamicStorage<T> const _storage;
 			Integer _offset;
 
 			explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
@@ -59,11 +59,11 @@ class Stack
 
 		private:
 
-		Stack* _stack;
+		const Stack* const _stack;
+		Integer const _edge;
 		Integer _offset;
-		Integer _edge;
 
-		explicit DescendingSequence(Stack* const stack, Integer const offset, Integer const edge) : _stack(stack), _offset(offset), _edge(edge) { }
+		explicit DescendingSequence(const Stack* const stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
 
 		public:
 
@@ -71,7 +71,7 @@ class Stack
 		{
 			friend struct DescendingSequence;
 
-			DynamicStorage<T> _storage;
+			DynamicStorage<T> const _storage;
 			Integer _offset;
 
 			explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }

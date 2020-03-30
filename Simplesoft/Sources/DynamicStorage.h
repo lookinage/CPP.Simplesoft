@@ -22,7 +22,14 @@ class DynamicStorage
 	{
 		return _count;
 	}
-
+	T Get(Integer const offset)
+	{
+		return _data[offset];
+	}
+	void Set(Integer const offset, T const value)
+	{
+		_data[offset] = value;
+	}
 	void EnsureCount(Integer const count)
 	{
 		Integer newCount;
