@@ -113,27 +113,13 @@ class Stack
 	{
 	}
 
-	void Clear()
-	{
-		_count = 0x0LL;
-	}
-	bool Remove(T& const element)
-	{
-		if (_count == 0x0LL)
-			return false;
-		element = _storage[--_count];
-		return true;
-	}
-	void Add(T const element)
-	{
-		Integer offset;
-
-		_storage.EnsureCount(_count = (offset = _count) + 0x1LL);
-		_storage[offset] = element;
-	}
 	Integer GetCount()
 	{
 		return _count;
+	}
+	T Get(Integer const offset)
+	{
+		return _storage[offset];
 	}
 	AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge)
 	{
@@ -150,6 +136,31 @@ class Stack
 	AscendingSequence GetDescendingSequence()
 	{
 		return GetDescendingSequence(_count - 0x1LL, -0x1LL);
+	}
+	void Clear()
+	{
+		_count = 0x0LL;
+	}
+	bool Remove(T& const value)
+	{
+		if (_count == 0x0LL)
+			return false;
+		value = _storage[--_count];
+		return true;
+	}
+	bool Add(T const value)
+	{
+		Integer offset;
+
+		if ((offset = _count) == 0x7FFFFFFFFFFFFFFFLL)
+			return false;
+		_storage.EnsureCount(_count = offset + 0x1LL);
+		_storage[offset] = value;
+		return true;
+	}
+	void Set(Integer const offset, T const value)
+	{
+		_storage[offset] = value;
 	}
 
 	T& operator[](Integer const index) const
