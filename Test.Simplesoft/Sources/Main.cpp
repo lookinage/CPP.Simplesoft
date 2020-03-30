@@ -20,7 +20,7 @@ void TestStaticStorage()
 	v = 3;
 	v = storage[0x0LL];
 }
-__int32& GetValue(DynamicStorage<__int32>& storage, int offset)
+__int32& GetValue(DynamicStorage<__int32>& storage, __int32 offset)
 {
 	return storage[offset];
 }

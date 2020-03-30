@@ -102,7 +102,7 @@ class Stack
 	};
 
 	DynamicStorage<T> _storage;
-	__int32 _count;
+	Integer _count;
 
 	public:
 
