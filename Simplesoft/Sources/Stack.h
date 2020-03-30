@@ -137,17 +137,6 @@ class Stack
 	{
 		return GetDescendingSequence(_count - 0x1LL, -0x1LL);
 	}
-	void Clear()
-	{
-		_count = 0x0LL;
-	}
-	bool Remove(T& const value)
-	{
-		if (_count == 0x0LL)
-			return false;
-		value = _storage[--_count];
-		return true;
-	}
 	bool Add(T const value)
 	{
 		Integer offset;
@@ -161,6 +150,17 @@ class Stack
 	void Set(Integer const offset, T const value)
 	{
 		_storage[offset] = value;
+	}
+	bool Remove(T& const value)
+	{
+		if (_count == 0x0LL)
+			return false;
+		value = _storage[--_count];
+		return true;
+	}
+	void Clear()
+	{
+		_count = 0x0LL;
 	}
 
 	T& operator[](Integer const index) const
