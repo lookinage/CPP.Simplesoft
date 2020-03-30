@@ -123,7 +123,7 @@ class Stack
 	}
 	AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge)
 	{
-		return AscendingSequence(this, offset, edge);
+		return AscendingSequence(this, edge, offset);
 	}
 	AscendingSequence GetAscendingSequence()
 	{
@@ -131,7 +131,7 @@ class Stack
 	}
 	AscendingSequence GetDescendingSequence(Integer const offset, Integer const edge)
 	{
-		return AscendingSequence(this, offset, edge);
+		return AscendingSequence(this, edge, offset);
 	}
 	AscendingSequence GetDescendingSequence()
 	{
