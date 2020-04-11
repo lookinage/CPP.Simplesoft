@@ -1,8 +1,8 @@
 #include <iostream>
 #include <Base.h>
-#include <StaticStorage.h>
-#include <DynamicStorage.h>
-#include <Stack.h>
+#include <Sets\StaticStorage.h>
+#include <Sets\DynamicStorage.h>
+#include <Sets\Stack.h>
 
 struct A
 {
@@ -11,48 +11,48 @@ struct A
 
 void TestStaticStorage()
 {
-	StaticStorage<__int32, 0x3LL> storage = StaticStorage<__int32, 0x3LL>();
+	Sets::StaticStorage<__int32, 0x3i64> storage = Sets::StaticStorage<__int32, 0x3i64>();
 	std::cout << storage.GetCount() << std::endl;
-	std::cout << storage[0x0LL] << std::endl;
-	std::cout << storage[0x1LL] << std::endl;
-	std::cout << storage[0x2LL] << std::endl;
-	__int32& v = storage[0x0LL];
+	std::cout << storage[0x0i64] << std::endl;
+	std::cout << storage[0x1i64] << std::endl;
+	std::cout << storage[0x2i64] << std::endl;
+	__int32& v = storage[0x0i64];
 	v = 3;
-	v = storage[0x0LL];
+	v = storage[0x0i64];
 }
-__int32& GetValue(DynamicStorage<__int32>& storage, __int32 offset)
+__int32& GetValue(Sets::DynamicStorage<__int32>& storage, __int32 offset)
 {
 	return storage[offset];
 }
 void TestDynamicStorage()
 {
-	DynamicStorage<__int32> storage(0x3LL);
-	storage[0x0LL] = 0x2LL;
-	storage[0x1LL] = 0x1LL;
-	storage[0x2LL] = 0x0LL;
+	Sets::DynamicStorage<__int32> storage(0x3i64);
+	storage[0x0i64] = 0x2i64;
+	storage[0x1i64] = 0x1i64;
+	storage[0x2i64] = 0x0i64;
 
 	bool a = storage == storage;
 
-	std::cout << storage[0x0LL] << std::endl;
-	std::cout << storage[0x1LL] << std::endl;
-	std::cout << storage[0x2LL] << std::endl;
+	std::cout << storage[0x0i64] << std::endl;
+	std::cout << storage[0x1i64] << std::endl;
+	std::cout << storage[0x2i64] << std::endl;
 
-	storage.EnsureCount(0x50LL);
+	storage.EnsureCapacity(0x50i64);
 
-	std::cout << storage[0x0LL] << std::endl;
-	std::cout << storage[0x1LL] << std::endl;
-	std::cout << storage[0x2LL] << std::endl;
-	std::cout << storage[0x3LL] << std::endl;
-	std::cout << storage[0x4LL] << std::endl;
-	std::cout << storage[0x5LL] << std::endl;
+	std::cout << storage[0x0i64] << std::endl;
+	std::cout << storage[0x1i64] << std::endl;
+	std::cout << storage[0x2i64] << std::endl;
+	std::cout << storage[0x3i64] << std::endl;
+	std::cout << storage[0x4i64] << std::endl;
+	std::cout << storage[0x5i64] << std::endl;
 
-	__int32& v = GetValue(storage, 0x0LL);
+	__int32& v = GetValue(storage, 0x0i64);
 	v = 3;
-	v = GetValue(storage, 0x0LL);
+	v = GetValue(storage, 0x0i64);
 }
 void TestStack()
 {
-	Stack<__int32> stack;
+	Sets::Stack<__int32> stack(0x0i64);
 
 	stack.Add(1);
 	__int32& v = stack[0];
@@ -66,5 +66,7 @@ void TestStack()
 
 __int32 main()
 {
-	TestStack();
+	unsigned __int64 a = 0xFFFFFFFFFFFFFFFF;
+	__int8* bytes = new __int8[a];
+
 }

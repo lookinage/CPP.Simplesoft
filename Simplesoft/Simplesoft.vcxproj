@@ -156,10 +156,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Base.h" />
-    <ClInclude Include="Sources\DynamicStorage.h" />
-    <ClInclude Include="Sources\Stack.h" />
-    <ClInclude Include="Sources\Subset.h" />
-    <ClInclude Include="Sources\StaticStorage.h" />
+    <ClInclude Include="Sources\Sets\DynamicStorage.h" />
+    <ClInclude Include="Sources\Sets\Ring.h" />
+    <ClInclude Include="Sources\Sets\Stack.h" />
+    <ClInclude Include="Sources\Sets\Subset.h" />
+    <ClInclude Include="Sources\Sets\StaticStorage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
