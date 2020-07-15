@@ -33,11 +33,11 @@ namespace Sets
 	template<typename T, Integer Count>
 	bool operator==(StaticStorage<T, Count> const left, StaticStorage<T, Count> const right)
 	{
-		return memcmp(&left, &right, sizeof(T) * Count) == 0x0;
+		return memcmp(&left, &right, sizeof(T) * Count) == 0x0i64;
 	};
 	template<typename T, Integer Count>
 	bool operator!=(StaticStorage<T, Count> const left, StaticStorage<T, Count> const right)
 	{
-		return memcmp(&left, &right, sizeof(T) * Count) != 0x0;
+		return memcmp(&left, &right, sizeof(T) * Count) != 0x0i64;
 	};
 }
