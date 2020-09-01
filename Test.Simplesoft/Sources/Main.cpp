@@ -52,7 +52,7 @@ void TestDynamicStorage()
 }
 void TestStack()
 {
-	Sets::Stack<__int32> stack(0x0i64);
+	Sets::StandingStack<__int32> stack(0x0i64);
 
 	stack.Add(1);
 	__int32& v = stack[0];

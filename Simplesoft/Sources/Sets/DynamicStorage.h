@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "..\Base.h"
 
 namespace Sets
 {
@@ -8,64 +9,36 @@ namespace Sets
 	class DynamicStorage
 	{
 		Integer _capacity;
-		T* _data;
+		T* _elements;
 
 	public:
 
-		explicit DynamicStorage(const Integer count) : _capacity(count), _data(new T[count])
-		{
-		}
-		~DynamicStorage()
-		{
-			delete _data;
-		}
+		explicit DynamicStorage(const Integer count) : _capacity(count), _elements(new T[count]) { }
+		~DynamicStorage() { delete _elements; }
 
-		static Integer EnsureCapacity(Integer capacity, Integer count)
-		{
-			if (count == 0x0i64)
-				return 0x1i64;
-			do
-			{
-				capacity <<= 0x1i64;
-				if (capacity < 0x0i64)
-				{
-					capacity = MaxIntegerValue;
-					break;
-				}
-			}
-			while (capacity < count);
-			return capacity;
-		}
-		Integer GetCapacity() const
-		{
-			return _capacity;
-		}
-		T Get(Integer const offset)
-		{
-			return _data[offset];
-		}
-		void Set(Integer const offset, T const value)
-		{
-			_data[offset] = value;
-		}
+		Integer GetCapacity() const { return _capacity; }
+		T Get(Integer const offset) { return _elements[offset]; }
+		void Set(Integer const offset, T const value) { _elements[offset] = value; }
 		void EnsureCapacity(Integer const count)
 		{
-			Integer newCapacity;
-			T* newData;
+			Integer capacity;
+			T* elements;
 
 			if (count <= _capacity)
 				return;
-			memcpy(newData = new T[newCapacity = EnsureCapacity(_capacity, count)], _data, _capacity * sizeof(T));
-			_capacity = newCapacity;
-			delete _data;
-			_data = newData;
+			memcpy
+			(
+				elements = new T[capacity = GetEnoughCapacity(_capacity, count)],
+				_elements, 
+				_capacity * sizeof(T)
+			);
+			_capacity = capacity;
+			delete _elements;
+			_elements = elements;
 			return;
 		}
 
-		T& operator[](Integer const offset) const
-		{
-			return _data[offset];
-		}
+		T& operator[](Integer const offset) const { return _elements[offset]; }
 
 		template<typename T>
 		friend bool operator==(DynamicStorage<T> const left, DynamicStorage<T> const right);
@@ -74,13 +47,7 @@ namespace Sets
 	};
 
 	template<typename T>
-	bool operator==(DynamicStorage<T> const left, DynamicStorage<T> const right)
-	{
-		return left._data == right._data;
-	};
+	bool operator==(DynamicStorage<T> const left, DynamicStorage<T> const right) { return left._elements == right._elements; };
 	template<typename T>
-	bool operator!=(DynamicStorage<T> const left, DynamicStorage<T> const right)
-	{
-		return left._data != right._data;
-	};
+	bool operator!=(DynamicStorage<T> const left, DynamicStorage<T> const right) { return left._elements != right._elements; };
 }

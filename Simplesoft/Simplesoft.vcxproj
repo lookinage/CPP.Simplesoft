@@ -157,8 +157,8 @@
   <ItemGroup>
     <ClInclude Include="Sources\Base.h" />
     <ClInclude Include="Sources\Sets\DynamicStorage.h" />
-    <ClInclude Include="Sources\Sets\Ring.h" />
-    <ClInclude Include="Sources\Sets\Stack.h" />
+    <ClInclude Include="Sources\Sets\LyingStack.h" />
+    <ClInclude Include="Sources\Sets\StandingStack.h" />
     <ClInclude Include="Sources\Sets\Subset.h" />
     <ClInclude Include="Sources\Sets\StaticStorage.h" />
   </ItemGroup>

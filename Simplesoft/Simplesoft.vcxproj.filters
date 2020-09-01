@@ -21,16 +21,16 @@
     <ClInclude Include="Sources\Sets\DynamicStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Sets\Ring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Sets\Stack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Sets\StaticStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Sets\Subset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Sets\StandingStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Sets\LyingStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
