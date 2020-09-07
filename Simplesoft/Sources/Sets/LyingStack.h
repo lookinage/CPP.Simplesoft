@@ -8,11 +8,64 @@ namespace Sets
 	template<typename T>
 	class LyingStack
 	{
-		struct AscendingSequence
+		T* _elements;
+		Integer _capacity;
+		Integer _startOffset;
+		Integer _endOffset;
+		Integer _count;
+
+		inline Integer GetActualOffset(Integer const offset) const
+		{
+			Integer actualOffset;
+
+			if ((actualOffset = _startOffset + offset) >= _capacity)
+				return actualOffset - _capacity;
+			if (actualOffset < 0x0I64)
+				return actualOffset + _capacity;
+			return actualOffset;
+		}
+		inline void IncreaseCapacity()
+		{
+			T* elements;
+			Integer capacity;
+
+			capacity = GetEnoughCapacity(_capacity, _count);
+			elements = new T[capacity];
+			if (_startOffset != 0x0)
+			{
+				memcpy
+				(
+					elements,
+					_elements + _startOffset,
+					(_capacity - _startOffset) * sizeof(T)
+				);
+				memcpy
+				(
+					elements + _capacity - _startOffset,
+					_elements,
+					(_startOffset) * sizeof(T)
+				);
+			}
+			else
+				memcpy
+				(
+					elements,
+					_elements,
+					_capacity * sizeof(T)
+				);
+			delete _elements;
+			_elements = elements;
+			_capacity = capacity;
+			_startOffset = 0x0I64;
+			_endOffset = _count - 0x1I64;
+			return;
+		}
+
+	public:
+
+		class AscendingSequence
 		{
 			friend class LyingStack;
-
-		private:
 
 			const LyingStack* const _stack;
 			Integer const _edge;
@@ -22,131 +75,174 @@ namespace Sets
 
 		public:
 
-			struct Enumerator
+			class Enumerator
 			{
-				friend struct AscendingSequence;
+				friend class AscendingSequence;
 
-				DynamicStorage<T> const _storage;
+				const LyingStack* const _stack;
 				Integer _offset;
 
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
+				explicit Enumerator(const LyingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
 
 			public:
 
 				Enumerator& operator++()
 				{
-					if (++_offset == _storage.GetCapacity())
-						_offset = 0x0i64;
+					if (++_offset == _stack->_capacity)
+						_offset = 0x0I64;
 					return *this;
 				}
 				bool operator==(Enumerator const other) const { return _offset == other._offset; }
 				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
+				T operator*() const { return _stack->_elements[_offset]; }
 			};
 
-			Enumerator begin() { return Enumerator(_stack->_storage, _offset); }
-			Enumerator end() { return Enumerator(_stack->_storage, _edge); }
+			Enumerator begin() { return Enumerator(_stack, _offset); }
+			Enumerator end() { return Enumerator(_stack, _edge); }
 		};
-		struct DescendingSequence
+		class DescendingSequence
 		{
 			friend class LyingStack;
-
-		private:
 
 			const LyingStack* const _stack;
 			Integer const _edge;
 			Integer _offset;
 
-			explicit DescendingSequence(const LyingStack* const Ring, Integer const edge, Integer const offset) : _stack(Ring), _edge(edge), _offset(offset) { }
+			explicit DescendingSequence(const LyingStack* const stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
 
 		public:
 
-			struct Enumerator
+			class Enumerator
 			{
-				friend struct DescendingSequence;
+				friend class DescendingSequence;
 
-				DynamicStorage<T> const _storage;
+				const LyingStack* const _stack;
 				Integer _offset;
 
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
+				explicit Enumerator(const LyingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
 
 			public:
 
 				Enumerator& operator++()
 				{
-					if (--_offset < 0x0i64)
-						_offset = _storage.GetCapacity() - 0x1i64;
+					if (--_offset < 0x0I64)
+						_offset = _stack->_capacity - 0x1I64;
 					return *this;
 				}
 				bool operator==(Enumerator const other) const { return _offset == other._offset; }
 				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
+				T operator*() const { return _stack->_elements[_offset]; }
 			};
 
-			Enumerator begin() { return Enumerator(_stack->_storage, _offset); }
-			Enumerator end() { return Enumerator(_stack->_storage, _edge); }
+			Enumerator begin() { return Enumerator(_stack, _offset); }
+			Enumerator end() { return Enumerator(_stack, _edge); }
 		};
 
-		DynamicStorage<T> _storage;
-		Integer _startIndex;
-		Integer _endIndex;
-		Integer _count;
+		explicit LyingStack(Integer const capacity) : _elements(new T[capacity]), _capacity(capacity), _startOffset(0x0I64), _endOffset(0x0I64), _count(0x0I64) { }
+		~LyingStack() { delete _elements; }
 
-	public:
-
-		explicit LyingStack(Integer const capacity) : _storage(capacity), _count(0x0i64) { }
-
-		Integer GetCount() { return _count; }
-		T Get(Integer const offset) { return  _startIndex + offset < _storage.GetCapacity() ? _storage[_startIndex + offset] : _storage[offset - _storage.GetCapacity() + _startIndex]; }
-		AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge) const { return AscendingSequence(this, edge, offset); }
-		AscendingSequence GetAscendingSequence() const { return GetAscendingSequence(0x0i64, _count); }
-		AscendingSequence GetDescendingSequence(Integer const offset, Integer const edge) const { return AscendingSequence(this, edge, offset); }
-		AscendingSequence GetDescendingSequence() const { return GetDescendingSequence(_count - 0x1i64, -0x1i64); }
-		bool AddLast(T const value)
+		Integer GetCount() const { return _count; }
+		T TryGetAt(Integer const offset) { return _elements[GetActualOffset(offset)]; }
+		AscendingSequence GetAscendingSequence(Integer const edge, Integer const offset) const
 		{
-			if (_count == MaxIntegerValue)
-				return false;
-			if (_count++ == _storage.GetCapacity())
-				_storage.EnsureCapacity(_count);
-			_storage[_endIndex] = value;
-			if (++_endIndex == _storage.GetCapacity())
-				_endIndex = 0x0i64;
-			return true;
+			return AscendingSequence
+			(
+				this,
+				GetActualOffset(edge),
+				GetActualOffset(offset)
+			);
 		}
-		bool AddFirst(T const value)
+		AscendingSequence GetAscendingSequence() const
 		{
-			if (_count == MaxIntegerValue)
-				return false;
-			if (_count++ == _storage.GetCapacity())
-				_storage.EnsureCapacity(_count);
-			if (--_startIndex < 0x0i64)
-				_startIndex = _storage.GetCapacity() - 0x1i64;
-			_storage[_startIndex] = value;
-			return true;
+			return GetAscendingSequence
+			(
+				_count,
+				0x0I64
+			);
 		}
-		void Set(Integer const offset, T const value) { _storage[offset] = value; }
-		bool RemoveLast(T& const value)
+		DescendingSequence GetDescendingSequence(Integer const edge, Integer const offset) const
 		{
-			if (_count == 0x0i64)
+			return DescendingSequence
+			(
+				this,
+				GetActualOffset(edge),
+				GetActualOffset(offset)
+			);
+		}
+		DescendingSequence GetDescendingSequence() const
+		{
+			return GetDescendingSequence
+			(
+				-0x1I64,
+				_count - 0x1I64
+			);
+		}
+		bool TryAddLast(T const value)
+		{
+			if (_count++ != MaxIntegerValue)
+			{
+				if (_count <= _capacity)
+				{
+					if (_endOffset != _capacity)
+					{
+					Adding:
+						_elements[_endOffset++] = value;
+						return true;
+					}
+					_endOffset = 0x0I64;
+					goto Adding;
+				}
+				IncreaseCapacity();
+				goto Adding;
+			}
+			_count--;
+			return false;
+		}
+		bool TryAddFirst(T const value)
+		{
+			if (_count++ != MaxIntegerValue)
+			{
+				if (_count <= _capacity)
+				{
+				CheckingOffset:
+					if (--_startOffset >= 0x0I64)
+					{
+					Adding:
+						_elements[_startOffset] = value;
+						return true;
+					}
+					_startOffset = _capacity - 0x1I64;
+					goto Adding;
+				}
+				IncreaseCapacity();
+				goto CheckingOffset;
+			}
+			_count--;
+			return false;
+		}
+		void Set(Integer const offset, T const value) { _elements[offset] = value; }
+		bool TryRemoveLast(T& value)
+		{
+			if (_count == 0x0I64)
 				return false;
 			_count--;
-			if (--_endIndex < 0x0i64)
-				_endIndex = _storage.GetCapacity() - 0x1i64;
-			value = _storage[_endIndex];
+			if (--_endOffset < 0x0I64)
+				_endOffset = _capacity - 0x1I64;
+			value = _elements[_endOffset];
 			return true;
 		}
-		bool RemoveFirst(T& const value)
+		bool TryRemoveFirst(T& value)
 		{
-			if (_count == 0x0i64)
+			if (_count == 0x0I64)
 				return false;
 			_count--;
-			value = _storage[_startIndex];
-			if (++_startIndex == _storage.GetCapacity())
-				_startIndex = 0x0i64;
+			value = _elements[_startOffset];
+			if (++_startOffset == _capacity)
+				_startOffset = 0x0I64;
 			return true;
 		}
-		void Clear() { _count = 0x0i64; }
+		void Clear() { _count = 0x0I64; }
 
-		T& operator[](Integer const index) const { return _storage[index]; }
+		T& operator[](Integer const offset) const { return _elements[offset]; }
 	};
 }

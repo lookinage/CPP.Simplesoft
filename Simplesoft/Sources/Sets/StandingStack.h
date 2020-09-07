@@ -8,7 +8,12 @@ namespace Sets
 	template<typename T>
 	class StandingStack
 	{
-		struct AscendingSequence
+		DynamicStorage<T> _storage;
+		Integer _count;
+
+	public:
+
+		class AscendingSequence
 		{
 			friend class StandingStack;
 
@@ -20,14 +25,14 @@ namespace Sets
 
 		public:
 
-			struct Enumerator
+			class Enumerator
 			{
-				friend struct AscendingSequence;
+				friend class AscendingSequence;
 
-				const DynamicStorage<T> const _storage;
+				const StandingStack* const _stack;
 				Integer _offset;
 
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
+				explicit Enumerator(const StandingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
 
 			public:
 
@@ -38,13 +43,13 @@ namespace Sets
 				}
 				bool operator==(Enumerator const other) const { return _offset == other._offset; }
 				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
+				T operator*() const { return _stack->_storage[_offset]; }
 			};
 
-			Enumerator begin() const { return Enumerator(_stack->_storage, _offset); }
-			Enumerator end() const { return Enumerator(_stack->_storage, _edge); }
+			Enumerator begin() const { return Enumerator(_stack, _offset); }
+			Enumerator end() const { return Enumerator(_stack, _edge); }
 		};
-		struct DescendingSequence
+		class DescendingSequence
 		{
 			friend class StandingStack;
 
@@ -56,14 +61,14 @@ namespace Sets
 
 		public:
 
-			struct Enumerator
+			class Enumerator
 			{
-				friend struct DescendingSequence;
+				friend class DescendingSequence;
 
-				const DynamicStorage<T> const _storage;
+				const StandingStack* const _stack;
 				Integer _offset;
 
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
+				explicit Enumerator(const StandingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
 
 			public:
 
@@ -74,46 +79,81 @@ namespace Sets
 				}
 				bool operator==(Enumerator const other) const { return _offset == other._offset; }
 				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
+				T operator*() const { return _stack->_storage[_offset]; }
 			};
 
-			Enumerator begin() const { return Enumerator(_stack->_storage, _offset); }
-			Enumerator end() const { return Enumerator(_stack->_storage, _edge); }
+			Enumerator begin() const { return Enumerator(_stack, _offset); }
+			Enumerator end() const { return Enumerator(_stack, _edge); }
 		};
 
-		DynamicStorage<T> _storage;
-		Integer _count;
+		explicit StandingStack(Integer const capacity) : _storage(capacity), _count(0x0I64) { }
 
-	public:
-
-		explicit StandingStack(Integer const capacity) : _storage(capacity), _count(0x0i64) { }
-
-		Integer GetCount() { return _count; }
-		T Get(Integer const offset) { return _storage[offset]; }
-		AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge) const { return AscendingSequence(this, edge, offset); }
-		AscendingSequence GetAscendingSequence() const { return GetAscendingSequence(0x0i64, _count); }
-		AscendingSequence GetDescendingSequence(Integer const offset, Integer const edge) const { return AscendingSequence(this, edge, offset); }
-		AscendingSequence GetDescendingSequence() const { return GetDescendingSequence(_count - 0x1i64, -0x1i64); }
-		bool Add(T const value)
+		Integer GetCount() const { return _count; }
+		T TryGetAt(Integer const offset) { return _storage[offset]; }
+		AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge) const 
+		{ 
+			return AscendingSequence
+			(
+				this, 
+				edge, 
+				offset
+			);
+		}
+		AscendingSequence GetAscendingSequence() const 
+		{ 
+			return GetAscendingSequence
+			(
+				0x0I64, 
+				_count
+			); 
+		}
+		DescendingSequence GetDescendingSequence(Integer const offset, Integer const edge) const
+		{ 
+			return DescendingSequence
+			(
+				this, 
+				edge, 
+				offset
+			); 
+		}
+		DescendingSequence GetDescendingSequence() const 
+		{ 
+			return GetDescendingSequence
+			(
+				_count - 0x1I64, 
+				-0x1I64
+			); 
+		}
+		bool TryAdd(T const value)
 		{
 			Integer offset;
 
-			if ((offset = _count) == MaxIntegerValue)
-				return false;
-			_storage.EnsureCapacity(_count = offset + 0x1i64);
-			_storage[offset] = value;
-			return true;
+			if ((offset = _count++) != MaxIntegerValue)
+			{
+				if (_count <= _storage.GetCapacity())
+				{
+				Adding:
+					_storage[offset] = value;
+					return true;
+				}
+				_storage.SetCapacity(GetEnoughCapacity(_storage.GetCapacity(), _count));
+				goto Adding;
+			}
+			_count--;
+			return false;
 		}
 		void Set(Integer const offset, T const value) { _storage[offset] = value; }
-		bool Remove(T& value)
+		bool TryRemove(T& value)
 		{
-			if (_count == 0x0i64)
-				return false;
-			value = _storage[--_count];
-			return true;
+			if (_count != 0x0I64)
+			{
+				value = _storage[--_count];
+				return true;
+			}
+			return false;
 		}
-		void Clear() { _count = 0x0i64; }
+		void Clear() { _count = 0x0I64; }
 
-		T& operator[](Integer const index) const { return _storage[index]; }
+		T& operator[](Integer const offset) const { return _storage[offset]; }
 	};
 }

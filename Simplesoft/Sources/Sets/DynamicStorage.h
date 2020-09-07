@@ -17,19 +17,16 @@ namespace Sets
 		~DynamicStorage() { delete _elements; }
 
 		Integer GetCapacity() const { return _capacity; }
-		T Get(Integer const offset) { return _elements[offset]; }
+		T TryGetAt(Integer const offset) const { return _elements[offset]; }
 		void Set(Integer const offset, T const value) { _elements[offset] = value; }
-		void EnsureCapacity(Integer const count)
+		void SetCapacity(Integer const capacity)
 		{
-			Integer capacity;
 			T* elements;
 
-			if (count <= _capacity)
-				return;
 			memcpy
 			(
-				elements = new T[capacity = GetEnoughCapacity(_capacity, count)],
-				_elements, 
+				elements = new T[capacity],
+				_elements,
 				_capacity * sizeof(T)
 			);
 			_capacity = capacity;

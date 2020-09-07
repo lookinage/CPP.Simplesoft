@@ -10,7 +10,7 @@ namespace Sets
 	public:
 
 		const Integer GetCount() const { return Count; }
-		T Get(Integer const offset) { return _elements[offset]; }
+		T TryGetAt(Integer const offset) { return _elements[offset]; }
 		void Set(Integer const offset, T const value) { _elements[offset] = value; }
 
 		T& operator[](Integer const offset) { return _elements[offset]; }
@@ -25,7 +25,7 @@ namespace Sets
 			&right,
 			sizeof(T) * Count
 		);
-		return compareResult == 0x0i64;
+		return compareResult == 0x0I64;
 	};
 	template<typename T, Integer Count>
 	bool operator!=(StaticStorage<T, Count> const left, StaticStorage<T, Count> const right)
@@ -36,6 +36,6 @@ namespace Sets
 			&right,
 			sizeof(T) * Count
 		);
-		return compareResult != 0x0i64;
+		return compareResult != 0x0I64;
 	};
 }
