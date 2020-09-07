@@ -28,20 +28,22 @@ namespace Sets
 		{
 			T* elements;
 			Integer capacity;
+			Integer offset;
 
 			capacity = GetEnoughCapacity(_capacity, _count);
+			offset = (capacity - _capacity) >> 0x1I64;
 			elements = new T[capacity];
 			if (_startOffset != 0x0)
 			{
 				memcpy
 				(
-					elements,
+					elements + offset,
 					_elements + _startOffset,
 					(_capacity - _startOffset) * sizeof(T)
 				);
 				memcpy
 				(
-					elements + _capacity - _startOffset,
+					elements + offset + _capacity - _startOffset,
 					_elements,
 					(_startOffset) * sizeof(T)
 				);
@@ -49,15 +51,15 @@ namespace Sets
 			else
 				memcpy
 				(
-					elements,
+					elements + offset,
 					_elements,
 					_capacity * sizeof(T)
 				);
 			delete _elements;
 			_elements = elements;
 			_capacity = capacity;
-			_startOffset = 0x0I64;
-			_endOffset = _count - 0x1I64;
+			_startOffset = offset;
+			_endOffset = offset + _count - 0x1I64;
 			return;
 		}
 
@@ -183,14 +185,11 @@ namespace Sets
 			{
 				if (_count <= _capacity)
 				{
-					if (_endOffset != _capacity)
-					{
-					Adding:
-						_elements[_endOffset++] = value;
-						return true;
-					}
-					_endOffset = 0x0I64;
-					goto Adding;
+				Adding:
+					_elements[_endOffset++] = value;
+					if (_endOffset == _capacity)
+						_endOffset = 0x0I64;
+					return true;
 				}
 				IncreaseCapacity();
 				goto Adding;
@@ -243,6 +242,6 @@ namespace Sets
 		}
 		void Clear() { _count = 0x0I64; }
 
-		T& operator[](Integer const offset) const { return _elements[offset]; }
+		T& operator[](Integer const offset) const { return _elements[GetActualOffset(offset)]; }
 	};
 }

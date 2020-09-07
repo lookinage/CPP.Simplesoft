@@ -79,12 +79,12 @@ void TestLyingStack()
 
 	stack.TryAddFirst(1);
 	stack.TryAddFirst(3);
-	stack.TryAddFirst(2);
+	stack.TryAddLast(2);
 	__int32& v = stack[0];
 	__int32& v2 = stack[1];
 	__int32& v3 = stack[2];
 
-	auto a = stack.GetDescendingSequence();
+	auto a = stack.GetAscendingSequence();
 
 	for (__int32 value : a)
 	{
