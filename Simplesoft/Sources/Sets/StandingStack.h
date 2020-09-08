@@ -36,14 +36,14 @@ namespace Sets
 
 			public:
 
+				bool operator==(Enumerator const other) const { return _offset == other._offset; }
+				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
+				T operator*() const { return _stack->_storage[_offset]; }
 				Enumerator& operator++()
 				{
 					_offset++;
 					return *this;
 				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_storage[_offset]; }
 			};
 
 			Enumerator begin() const { return Enumerator(_stack, _offset); }
@@ -72,24 +72,26 @@ namespace Sets
 
 			public:
 
+				bool operator==(Enumerator const other) const { return _offset == other._offset; }
+				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
+				T operator*() const { return _stack->_storage[_offset]; }
 				Enumerator& operator++()
 				{
 					_offset--;
 					return *this;
 				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_storage[_offset]; }
 			};
 
 			Enumerator begin() const { return Enumerator(_stack, _offset); }
 			Enumerator end() const { return Enumerator(_stack, _edge); }
 		};
 
+		StandingStack(StandingStack& instance) = delete;
+		StandingStack(StandingStack&& instance) = delete;
 		explicit StandingStack(Integer const capacity) : _storage(capacity), _count(0x0I64) { }
 
 		Integer GetCount() const { return _count; }
-		T TryGetAt(Integer const offset) { return _storage[offset]; }
+		T GetAt(Integer const offset) const { return _storage[offset]; }
 		AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge) const 
 		{ 
 			return AscendingSequence
@@ -153,7 +155,5 @@ namespace Sets
 			return false;
 		}
 		void Clear() { _count = 0x0I64; }
-
-		T& operator[](Integer const offset) const { return _storage[offset]; }
 	};
 }

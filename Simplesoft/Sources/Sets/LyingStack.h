@@ -18,11 +18,9 @@ namespace Sets
 		{
 			Integer actualOffset;
 
-			if ((actualOffset = _startOffset + offset) >= _capacity)
-				return actualOffset - _capacity;
-			if (actualOffset < 0x0I64)
-				return actualOffset + _capacity;
-			return actualOffset;
+			if ((actualOffset = _startOffset + offset) < _capacity)
+				return actualOffset;
+			return actualOffset - _capacity;
 		}
 		inline void IncreaseCapacity()
 		{
@@ -33,7 +31,7 @@ namespace Sets
 			capacity = GetEnoughCapacity(_capacity, _count);
 			offset = (capacity - _capacity) >> 0x1I64;
 			elements = new T[capacity];
-			if (_startOffset != 0x0)
+			if (_startOffset != 0x0I64)
 			{
 				memcpy
 				(
@@ -88,19 +86,19 @@ namespace Sets
 
 			public:
 
+				bool operator==(Enumerator const other) const { return _offset == other._offset; }
+				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
+				T operator*() const { return _stack->_elements[_offset]; }
 				Enumerator& operator++()
 				{
 					if (++_offset == _stack->_capacity)
 						_offset = 0x0I64;
 					return *this;
 				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_elements[_offset]; }
 			};
 
-			Enumerator begin() { return Enumerator(_stack, _offset); }
-			Enumerator end() { return Enumerator(_stack, _edge); }
+			Enumerator begin() const { return Enumerator(_stack, _offset); }
+			Enumerator end() const { return Enumerator(_stack, _edge); }
 		};
 		class DescendingSequence
 		{
@@ -125,26 +123,28 @@ namespace Sets
 
 			public:
 
+				bool operator==(Enumerator const other) const { return _offset == other._offset; }
+				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
+				T operator*() const { return _stack->_elements[_offset]; }
 				Enumerator& operator++()
 				{
 					if (--_offset < 0x0I64)
 						_offset = _stack->_capacity - 0x1I64;
 					return *this;
 				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_elements[_offset]; }
 			};
 
-			Enumerator begin() { return Enumerator(_stack, _offset); }
-			Enumerator end() { return Enumerator(_stack, _edge); }
+			Enumerator begin() const { return Enumerator(_stack, _offset); }
+			Enumerator end() const { return Enumerator(_stack, _edge); }
 		};
 
+		LyingStack(LyingStack& instance) = delete;
+		LyingStack(LyingStack&& instance) = delete;
 		explicit LyingStack(Integer const capacity) : _elements(new T[capacity]), _capacity(capacity), _startOffset(0x0I64), _endOffset(0x0I64), _count(0x0I64) { }
 		~LyingStack() { delete _elements; }
 
 		Integer GetCount() const { return _count; }
-		T TryGetAt(Integer const offset) { return _elements[GetActualOffset(offset)]; }
+		T GetAt(Integer const offset) const { return _elements[GetActualOffset(offset)]; }
 		AscendingSequence GetAscendingSequence(Integer const edge, Integer const offset) const
 		{
 			return AscendingSequence
@@ -167,7 +167,7 @@ namespace Sets
 			return DescendingSequence
 			(
 				this,
-				GetActualOffset(edge),
+				GetActualOffset(edge == -0x1I64 ? _capacity - 0x1I64 : edge),
 				GetActualOffset(offset)
 			);
 		}
@@ -185,14 +185,14 @@ namespace Sets
 			{
 				if (_count <= _capacity)
 				{
-				Adding:
+				Setting:
 					_elements[_endOffset++] = value;
 					if (_endOffset == _capacity)
 						_endOffset = 0x0I64;
 					return true;
 				}
 				IncreaseCapacity();
-				goto Adding;
+				goto Setting;
 			}
 			_count--;
 			return false;
@@ -206,12 +206,12 @@ namespace Sets
 				CheckingOffset:
 					if (--_startOffset >= 0x0I64)
 					{
-					Adding:
+					Setting:
 						_elements[_startOffset] = value;
 						return true;
 					}
 					_startOffset = _capacity - 0x1I64;
-					goto Adding;
+					goto Setting;
 				}
 				IncreaseCapacity();
 				goto CheckingOffset;
@@ -219,29 +219,40 @@ namespace Sets
 			_count--;
 			return false;
 		}
-		void Set(Integer const offset, T const value) { _elements[offset] = value; }
+		void Set(Integer const offset, T const value) { _elements[GetActualOffset(offset)] = value; }
 		bool TryRemoveLast(T& value)
 		{
-			if (_count == 0x0I64)
-				return false;
-			_count--;
-			if (--_endOffset < 0x0I64)
+			if (_count-- != 0x0I64)
+			{
+				if (--_endOffset >= 0x0I64)
+				{
+				Setting:
+					value = _elements[_endOffset];
+					return true;
+				}
 				_endOffset = _capacity - 0x1I64;
-			value = _elements[_endOffset];
-			return true;
+				goto Setting;
+			}
+			_count++;
+			return false;
 		}
 		bool TryRemoveFirst(T& value)
 		{
-			if (_count == 0x0I64)
-				return false;
-			_count--;
-			value = _elements[_startOffset];
-			if (++_startOffset == _capacity)
+			if (_count-- != 0x0I64)
+			{
+				value = _elements[_startOffset];
+				if (++_startOffset != _capacity)
+					return true;
 				_startOffset = 0x0I64;
-			return true;
+				return true;
+			}
+			_count++;
+			return false;
 		}
-		void Clear() { _count = 0x0I64; }
-
-		T& operator[](Integer const offset) const { return _elements[GetActualOffset(offset)]; }
+		void Clear() 
+		{
+			_startOffset = _endOffset = _capacity >> 0x1I64;
+			_count = 0x0I64;
+		}
 	};
 }

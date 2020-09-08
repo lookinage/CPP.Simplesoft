@@ -10,14 +10,14 @@ namespace Sets
 	{
 		struct Element
 		{
-			Integer _nextElementIndex;
+			Integer _nextElementOffset;
 			Integer _simplifiedValue;
 			T _value;
 		};
 
 		DynamicStorage<Element> _storage;
-		Integer* _chainStartIndices;
-		Integer _freeElementIndex;
+		Integer* _chainStartOffsets;
+		Integer _freeElementOffset;
 		Integer _usedElementCount;
 		Integer _count;
 
@@ -27,95 +27,42 @@ namespace Sets
 
 			previousCapacity = _storage.GetCapacity();
 			_storage.SetCapacity(capacity);
-			delete _chainStartIndices;
-			_chainStartIndices = new Integer[capacity];
-			for (Integer elementIndex = 0x0I64; elementIndex != previousCapacity; elementIndex++)
+			delete _chainStartOffsets;
+			_chainStartOffsets = new Integer[capacity];
+			memset(_chainStartOffsets, 0x0I32, _storage.GetCapacity() * sizeof(Integer));
+			for (Integer elementOffset = 0x0I64; elementOffset != previousCapacity; elementOffset++)
 			{
-				Integer chainIndex = _storage[elementIndex]._simplifiedValue % capacity;
-				_storage[elementIndex]._nextElementIndex = _chainStartIndices[chainIndex] - 0x1I64;
-				_chainStartIndices[chainIndex] = elementIndex + 0x1I64;
+				Integer chainOffset = _storage[elementOffset]._simplifiedValue % capacity;
+				_storage[elementOffset]._nextElementOffset = _chainStartOffsets[chainOffset] - 0x1I64;
+				_chainStartOffsets[chainOffset] = elementOffset + 0x1I64;
 			}
 		}
 
 	public:
 
-		class AscendingSequence
+		class Enumerator
 		{
 			friend class Subset;
 
-			const Subset* const _subset;
-			Integer const _edge;
+			const Subset<T>* const _subset;
 			Integer _offset;
 
-			explicit AscendingSequence(const Subset* const subset, Integer const edge, Integer const offset) : _subset(subset), _edge(edge), _offset(offset) { }
+			explicit Enumerator(const Subset<T>* const subset, Integer const offset) : _subset(subset), _offset(offset) { }
 
 		public:
 
-			class Enumerator
+			bool operator==(Enumerator const other) const { return _offset == other._offset; }
+			bool operator!=(Enumerator const other) const { return _offset != other._offset; }
+			T operator*() const { return _subset->_storage[_offset]._value; }
+			Enumerator& operator++()
 			{
-				friend class AscendingSequence;
-
-				DynamicStorage<T> const _storage;
-				Integer _offset;
-
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
-
-			public:
-
-				Enumerator& operator++()
-				{
-					for (_offset++; _offset != _used;)
-						_offset = 0x0I64;
-					return *this;
-				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
-			};
-
-			Enumerator begin() { return Enumerator(_subset->_storage, _offset); }
-			Enumerator end() { return Enumerator(_subset->_storage, _edge); }
-		};
-		class DescendingSequence
-		{
-			friend class Subset;
-
-			const Subset* const _subset;
-			Integer const _edge;
-			Integer _offset;
-
-			explicit DescendingSequence(const Subset* const stack, Integer const edge, Integer const offset) : _subset(stack), _edge(edge), _offset(offset) { }
-
-		public:
-
-			class Enumerator
-			{
-				friend class DescendingSequence;
-
-				DynamicStorage<T> const _storage;
-				Integer _offset;
-
-				explicit Enumerator(DynamicStorage<T> const storage, Integer const offset) : _storage(storage), _offset(offset) { }
-
-			public:
-
-				Enumerator& operator++()
-				{
-					if (--_offset < 0x0I64)
-						_offset = _storage.GetCapacity() - 0x1I64;
-					return *this;
-				}
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _storage[_offset]; }
-			};
-
-			Enumerator begin() { return Enumerator(_subset->_storage, _offset); }
-			Enumerator end() { return Enumerator(_subset->_storage, _edge); }
+				for (_offset++; _subset->_storage[_offset]._simplifiedValue != -0x1I64 && _offset != _subset->_usedElementCount; _offset++);
+				return *this;
+			}
 		};
 
-		Subset(Integer const capacity) : _storage(capacity) { _chainStartIndices = new Integer[capacity]; }
-		~Subset() { delete _chainStartIndices; }
+		Subset(Integer const capacity) : _storage(capacity), _chainStartOffsets(new Integer[capacity]), _freeElementOffset(-0x1I64), _usedElementCount(0x0I64), _count(0x0I64) { }
+		~Subset() { delete _chainStartOffsets; }
 
 		Integer GetCount() const { return _count; }
 		bool TryGetAddress(T const value, Integer& address) const
@@ -123,11 +70,11 @@ namespace Sets
 			Integer simplifiedValue;
 
 			simplifiedValue = Simplify(value);
-			for (Integer elementIndex = _chainStartIndices[simplifiedValue % _storage.GetCapacity()] - 0x1I64; elementIndex != -0x1I64; elementIndex = _storage[elementIndex]._nextElementIndex)
+			for (Integer elementOffset = _chainStartOffsets[simplifiedValue % _storage.GetCapacity()] - 0x1I64; elementOffset != -0x1I64; elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementIndex]._value)
+				if (value != _storage[elementOffset]._value)
 					continue;
-				address = elementIndex;
+				address = elementOffset;
 				return true;
 			}
 			return false;
@@ -140,11 +87,13 @@ namespace Sets
 			value = _storage[address]._value;
 			return true;
 		}
+		Enumerator begin() const { return Enumerator(this, 0x0I64); }
+		Enumerator end() const { return Enumerator(this, _usedElementCount); }
 		bool TryAdd(T const value, Integer& address)
 		{
 			Integer simplifiedValue;
-			Integer chainIndex;
-			Integer elementIndex;
+			Integer chainOffset;
+			Integer elementOffset;
 
 			if (_count++ == MaxIntegerValue)
 			{
@@ -154,43 +103,43 @@ namespace Sets
 			if (_count > _storage.GetCapacity())
 				IncreaseCapacity(GetEnoughCapacity(_storage.GetCapacity(), _count));
 			simplifiedValue = Simplify(value);
-			chainIndex = simplifiedValue % _storage.GetCapacity();
-			for (elementIndex = _chainStartIndices[chainIndex] - 0x1I64; elementIndex != -0x1I64; elementIndex = _storage[elementIndex]._nextElementIndex)
+			chainOffset = simplifiedValue % _storage.GetCapacity();
+			for (elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; elementOffset != -0x1I64; elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementIndex]._value)
+				if (value != _storage[elementOffset]._value)
 					continue;
 				_count--;
 				return false;
 			}
-			if (_freeElementIndex != -0x1)
-				_freeElementIndex = _storage[elementIndex = _freeElementIndex]._nextElementIndex;
+			if (_freeElementOffset != -0x1)
+				_freeElementOffset = _storage[elementOffset = _freeElementOffset]._nextElementOffset;
 			else
-				elementIndex = _usedElementCount++;
-			_storage[elementIndex]._nextElementIndex = _chainStartIndices[chainIndex] - 0x1I64;
-			_storage[elementIndex]._simplifiedValue = simplifiedValue;
-			_storage[elementIndex]._value = value;
-			_chainStartIndices[chainIndex] = elementIndex + 0x1I64;
-			address = elementIndex;
+				elementOffset = _usedElementCount++;
+			_storage[elementOffset]._nextElementOffset = _chainStartOffsets[chainOffset] - 0x1I64;
+			_storage[elementOffset]._simplifiedValue = simplifiedValue;
+			_storage[elementOffset]._value = value;
+			_chainStartOffsets[chainOffset] = elementOffset + 0x1I64;
+			address = elementOffset;
 			return true;
 		}
 		bool TryRemove(T const value)
 		{
-			Integer chainIndex;
-			Integer lastElementIndex;
+			Integer chainOffset;
+			Integer lastElementOffset;
 
-			chainIndex = Simplify(value) % _storage.GetCapacity();
-			lastElementIndex = -0x1I64;
-			for (Integer elementIndex = _chainStartIndices[chainIndex] - 0x1I64; elementIndex != -0x1I64; lastElementIndex = elementIndex, elementIndex = _storage[elementIndex]._nextElementIndex)
+			chainOffset = Simplify(value) % _storage.GetCapacity();
+			lastElementOffset = -0x1I64;
+			for (Integer elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; elementOffset != -0x1I64; lastElementOffset = elementOffset, elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementIndex]._value)
+				if (value != _storage[elementOffset]._value)
 					continue;
-				if (lastElementIndex == -0x1I64)
-					_chainStartIndices[chainIndex] = _storage[elementIndex]._nextElementIndex + 0x1I64;
+				if (lastElementOffset == -0x1I64)
+					_chainStartOffsets[chainOffset] = _storage[elementOffset]._nextElementOffset + 0x1I64;
 				else
-					_storage[lastElementIndex]._nextElementIndex = _storage[elementIndex]._nextElementIndex;
-				_storage[elementIndex]._nextElementIndex = _freeElementIndex;
-				_storage[elementIndex]._simplifiedValue = -0x1I64;
-				_freeElementIndex = elementIndex;
+					_storage[lastElementOffset]._nextElementOffset = _storage[elementOffset]._nextElementOffset;
+				_storage[elementOffset]._nextElementOffset = _freeElementOffset;
+				_storage[elementOffset]._simplifiedValue = -0x1I64;
+				_freeElementOffset = elementOffset;
 				_count--;
 				return true;
 			}
@@ -203,27 +152,27 @@ namespace Sets
 			if (address < 0x0I64 || address >= _usedElementCount || (simplifiedValue = _storage[address]._simplifiedValue) == -0x1I64)
 				return false;
 			element = _storage[address]._value;
-			Integer chainIndex = simplifiedValue % _storage.GetCapacity();
-			Integer lastElementIndex = -0x1I64;
-			for (Integer elementIndex = _chainStartIndices[chainIndex] - 0x1I64; ; lastElementIndex = elementIndex, elementIndex = _storage[elementIndex]._nextElementIndex)
+			Integer chainOffset = simplifiedValue % _storage.GetCapacity();
+			Integer lastElementOffset = -0x1I64;
+			for (Integer elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; ; lastElementOffset = elementOffset, elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (element != _storage[elementIndex]._value)
+				if (element != _storage[elementOffset]._value)
 					continue;
-				if (lastElementIndex == -0x1I64)
-					_chainStartIndices[chainIndex] = _storage[elementIndex]._nextElementIndex + 0x1I64;
+				if (lastElementOffset == -0x1I64)
+					_chainStartOffsets[chainOffset] = _storage[elementOffset]._nextElementOffset + 0x1I64;
 				else
-					_storage[lastElementIndex]._nextElementIndex = _storage[elementIndex]._nextElementIndex;
-				_storage[elementIndex]._nextElementIndex = _freeElementIndex;
-				_storage[elementIndex]._simplifiedValue = -0x1I64;
-				_freeElementIndex = elementIndex;
+					_storage[lastElementOffset]._nextElementOffset = _storage[elementOffset]._nextElementOffset;
+				_storage[elementOffset]._nextElementOffset = _freeElementOffset;
+				_storage[elementOffset]._simplifiedValue = -0x1I64;
+				_freeElementOffset = elementOffset;
 				_count--;
 				return true;
 			}
 		}
 		void Clear()
 		{
-			memset(_chainStartIndices, 0x0I32, _storage.GetCapacity() * sizeof(Integer));
-			_freeElementIndex = -0x1I64;
+			memset(_chainStartOffsets, 0x0I32, _storage.GetCapacity() * sizeof(Integer));
+			_freeElementOffset = -0x1I64;
 			_usedElementCount = 0x0I64;
 			_count = 0x0I64;
 		}
