@@ -111,7 +111,7 @@ namespace Sets
 			return true;
 		}
 		Enumerator GetEnumerator() const { return Enumerator(*this); }
-		bool TryAdd(Relation<TInput, TOutput> relation, Integer& address)
+		bool TryAdd(Relation<TInput, TOutput> const relation, Integer& address)
 		{
 			Integer simplifiedInput;
 			Integer chainOffset;
