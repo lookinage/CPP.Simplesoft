@@ -6,7 +6,7 @@ const Integer MinIntegerValue = 0x8000000000000000I64;
 const Integer MaxIntegerValue = 0x7FFFFFFFFFFFFFFFI64;
 
 template<typename T>
-Integer Simplify(T const value)
+Integer Simplify(T&& value)
 {
 	Integer result;
 
@@ -37,19 +37,4 @@ Integer Simplify(T const value)
 		result ^= *(__int64*)((__int8*)&value + offset);
 	return result;
 }
-Integer GetEnoughCapacity(Integer capacity, Integer count)
-{
-	if (capacity == 0x0I64)
-		capacity = 0x1I64;
-	do
-	{
-		capacity <<= 0x1I64;
-		if (capacity < 0x0I64)
-		{
-			capacity = MaxIntegerValue;
-			break;
-		}
-	}
-	while (capacity < count);
-	return capacity;
-}
+Integer GetEnoughCapacity(Integer capacity, Integer const count);

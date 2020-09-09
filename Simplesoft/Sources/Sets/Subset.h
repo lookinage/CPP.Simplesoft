@@ -44,19 +44,39 @@ namespace Sets
 		{
 			friend class Subset;
 
-			const Subset<T>* const _subset;
+			Subset<T> const& _subset;
 			Integer _offset;
+			bool _canContinue;
 
-			explicit Enumerator(const Subset<T>* const subset, Integer const offset) : _subset(subset), _offset(offset) { }
+			explicit Enumerator(Subset<T> const& subset) : _subset(subset), _offset(0x0I64), _canContinue(true) { SetValid(); }
+
+			void SetValid()
+			{
+				for (; ; _offset++)
+				{
+					if (_offset != _subset._usedElementCount)
+					{
+						if (_subset._storage[_offset]._simplifiedValue != -0x1I64)
+							break;
+						else
+							continue;
+					}
+					else
+					{
+						_canContinue = false;
+						break;
+					}
+				}
+			}
 
 		public:
 
-			bool operator==(Enumerator const other) const { return _offset == other._offset; }
-			bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-			T operator*() const { return _subset->_storage[_offset]._value; }
+			bool operator!() const { return _canContinue; }
+			T operator*() const { return _subset._storage[_offset]._value; }
 			Enumerator& operator++()
 			{
-				for (_offset++; _subset->_storage[_offset]._simplifiedValue != -0x1I64 && _offset != _subset->_usedElementCount; _offset++);
+				_offset++;
+				SetValid();
 				return *this;
 			}
 		};
@@ -87,8 +107,7 @@ namespace Sets
 			value = _storage[address]._value;
 			return true;
 		}
-		Enumerator begin() const { return Enumerator(this, 0x0I64); }
-		Enumerator end() const { return Enumerator(this, _usedElementCount); }
+		Enumerator GetEnumerator() const { return Enumerator(*this); }
 		bool TryAdd(T const value, Integer& address)
 		{
 			Integer simplifiedValue;

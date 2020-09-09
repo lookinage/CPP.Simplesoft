@@ -17,7 +17,7 @@ namespace Sets
 	};
 
 	template<typename T, Integer Count>
-	bool operator==(StaticStorage<T, Count> const left, StaticStorage<T, Count> const right)
+	bool operator==(StaticStorage<T, Count> const& left, StaticStorage<T, Count> const& right)
 	{
 		__int32 compareResult = memcmp
 		(
@@ -28,7 +28,7 @@ namespace Sets
 		return compareResult == 0x0I64;
 	};
 	template<typename T, Integer Count>
-	bool operator!=(StaticStorage<T, Count> const left, StaticStorage<T, Count> const right)
+	bool operator!=(StaticStorage<T, Count> const& left, StaticStorage<T, Count> const& right)
 	{
 		__int32 compareResult = memcmp
 		(

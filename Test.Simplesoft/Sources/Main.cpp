@@ -13,7 +13,7 @@ struct A
 
 void TestStaticStorage()
 {
-	Sets::StaticStorage<__int32, 0x3I64> storage;
+	Sets::StaticStorage<__int32, 0x3I64> storage = Sets::StaticStorage<__int32, 0x3I64>();
 	std::cout << storage.GetCount() << std::endl;
 	std::cout << storage[0x0I64] << std::endl;
 	std::cout << storage[0x1I64] << std::endl;
@@ -55,17 +55,14 @@ void TestDynamicStorage()
 void TestStandingStack()
 {
 	Sets::StandingStack<__int32> stack(0x0I64);
-
 	stack.TryAdd(1);
 	stack.TryAdd(3);
 	stack.TryAdd(2);
 	__int32 v = stack.GetAt(2);
 
-	auto a =  stack.GetAscendingSequence();
-
-	for (__int32 value : a)
+	for (Sets::StandingStack<__int32>::AscendingEnumerator enumerator = stack.GetAscendingEnumerator(); !enumerator; ++enumerator)
 	{
-		std::cout << value;
+		std::cout << *enumerator;
 	}
 }
 void TestLyingStack()
@@ -79,11 +76,9 @@ void TestLyingStack()
 	__int32 v2 = stack.GetAt(1);
 	__int32 v3 = stack.GetAt(2);
 
-	auto a = stack.GetDescendingSequence();
-
-	for (__int32 value : a)
+	for (Sets::LyingStack<__int32>::DescendingEnumerator enumerator = stack.GetDescendingEnumerator(); !enumerator; ++enumerator)
 	{
-		std::cout << value;
+		std::cout << *enumerator;
 	}
 }
 void TestSubset()
@@ -94,14 +89,15 @@ void TestSubset()
 	subset.TryAdd(1, address);
 	subset.TryAdd(3, address);
 	subset.TryAdd(2, address);
+	subset.TryRemove(1);
 
-	for (__int32 value : subset)
+	for (Sets::Subset<__int32>::Enumerator enumerator = subset.GetEnumerator(); !enumerator; ++enumerator)
 	{
-		std::cout << value;
+		std::cout << *enumerator;
 	}
 }
 
 __int32 main()
 {
-	TestStaticStorage();
+	TestSubset();
 }

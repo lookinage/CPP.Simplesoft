@@ -13,114 +13,82 @@ namespace Sets
 
 	public:
 
-		class AscendingSequence
+		class AscendingEnumerator
 		{
 			friend class StandingStack;
 
-			const StandingStack* const _stack;
+			StandingStack const& _stack;
 			Integer const _edge;
 			Integer _offset;
 
-			explicit AscendingSequence(const StandingStack* const stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
+			explicit AscendingEnumerator(StandingStack const& stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
 
 		public:
 
-			class Enumerator
+			bool operator!() const { return _offset != _edge; }
+			T operator*() const { return _stack._storage[_offset]; }
+			AscendingEnumerator& operator++()
 			{
-				friend class AscendingSequence;
-
-				const StandingStack* const _stack;
-				Integer _offset;
-
-				explicit Enumerator(const StandingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
-
-			public:
-
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_storage[_offset]; }
-				Enumerator& operator++()
-				{
-					_offset++;
-					return *this;
-				}
-			};
-
-			Enumerator begin() const { return Enumerator(_stack, _offset); }
-			Enumerator end() const { return Enumerator(_stack, _edge); }
+				_offset++;
+				return *this;
+			}
 		};
-		class DescendingSequence
+		class DescendingEnumerator
 		{
 			friend class StandingStack;
 
-			const StandingStack* const _stack;
+			StandingStack const& _stack;
 			Integer const _edge;
 			Integer _offset;
 
-			explicit DescendingSequence(const StandingStack* const stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
+			explicit DescendingEnumerator(StandingStack const& stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
 
 		public:
 
-			class Enumerator
+			bool operator!() const { return _offset != _edge; }
+			T operator*() const { return _stack._storage[_offset]; }
+			DescendingEnumerator& operator++()
 			{
-				friend class DescendingSequence;
-
-				const StandingStack* const _stack;
-				Integer _offset;
-
-				explicit Enumerator(const StandingStack* const stack, Integer const offset) : _stack(stack), _offset(offset) { }
-
-			public:
-
-				bool operator==(Enumerator const other) const { return _offset == other._offset; }
-				bool operator!=(Enumerator const other) const { return _offset != other._offset; }
-				T operator*() const { return _stack->_storage[_offset]; }
-				Enumerator& operator++()
-				{
-					_offset--;
-					return *this;
-				}
-			};
-
-			Enumerator begin() const { return Enumerator(_stack, _offset); }
-			Enumerator end() const { return Enumerator(_stack, _edge); }
+				_offset--;
+				return *this;
+			}
 		};
 
-		StandingStack(StandingStack& instance) = delete;
-		StandingStack(StandingStack&& instance) = delete;
+		StandingStack(StandingStack const&) = delete;
+		StandingStack(StandingStack&&) = delete;
 		explicit StandingStack(Integer const capacity) : _storage(capacity), _count(0x0I64) { }
 
 		Integer GetCount() const { return _count; }
 		T GetAt(Integer const offset) const { return _storage[offset]; }
-		AscendingSequence GetAscendingSequence(Integer const offset, Integer const edge) const 
+		AscendingEnumerator GetAscendingEnumerator(Integer const offset, Integer const edge) const
 		{ 
-			return AscendingSequence
+			return AscendingEnumerator
 			(
-				this, 
+				*this, 
 				edge, 
 				offset
 			);
 		}
-		AscendingSequence GetAscendingSequence() const 
+		AscendingEnumerator GetAscendingEnumerator() const
 		{ 
-			return GetAscendingSequence
+			return GetAscendingEnumerator
 			(
 				0x0I64, 
 				_count
 			); 
 		}
-		DescendingSequence GetDescendingSequence(Integer const offset, Integer const edge) const
+		DescendingEnumerator GetDescendingEnumerator(Integer const offset, Integer const edge) const
 		{ 
-			return DescendingSequence
+			return DescendingEnumerator
 			(
-				this, 
+				*this, 
 				edge, 
 				offset
 			); 
 		}
-		DescendingSequence GetDescendingSequence() const 
+		DescendingEnumerator GetDescendingEnumerator() const
 		{ 
-			return GetDescendingSequence
+			return GetDescendingEnumerator
 			(
 				_count - 0x1I64, 
 				-0x1I64

@@ -162,6 +162,9 @@
     <ClInclude Include="Sources\Sets\Subset.h" />
     <ClInclude Include="Sources\Sets\StaticStorage.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\Base.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />

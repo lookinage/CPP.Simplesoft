@@ -13,6 +13,8 @@ namespace Sets
 
 	public:
 
+		DynamicStorage(DynamicStorage const&) = delete;
+		DynamicStorage(DynamicStorage&&) = delete;
 		explicit DynamicStorage(const Integer count) : _capacity(count), _elements(new T[count]) { }
 		~DynamicStorage() { delete _elements; }
 
@@ -38,13 +40,13 @@ namespace Sets
 		T& operator[](Integer const offset) const { return _elements[offset]; }
 
 		template<typename T>
-		friend bool operator==(DynamicStorage<T> const left, DynamicStorage<T> const right);
+		friend bool operator==(DynamicStorage<T> const& left, DynamicStorage<T> const& right);
 		template<typename T>
-		friend bool operator!=(DynamicStorage<T> const left, DynamicStorage<T> const right);
+		friend bool operator!=(DynamicStorage<T> const& left, DynamicStorage<T> const& right);
 	};
 
 	template<typename T>
-	bool operator==(DynamicStorage<T> const left, DynamicStorage<T> const right) { return left._elements == right._elements; };
+	bool operator==(DynamicStorage<T> const& left, DynamicStorage<T> const& right) { return left._elements == right._elements; };
 	template<typename T>
-	bool operator!=(DynamicStorage<T> const left, DynamicStorage<T> const right) { return left._elements != right._elements; };
+	bool operator!=(DynamicStorage<T> const& left, DynamicStorage<T> const& right) { return left._elements != right._elements; };
 }
