@@ -13,8 +13,6 @@ namespace Sets
 
 	public:
 
-		DynamicStorage(DynamicStorage const&) = delete;
-		DynamicStorage(DynamicStorage&&) = delete;
 		explicit DynamicStorage(const Integer count) : _capacity(count), _elements(new T[count]) { }
 		~DynamicStorage() { delete _elements; }
 

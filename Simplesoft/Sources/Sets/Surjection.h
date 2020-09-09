@@ -1,20 +1,21 @@
-﻿#pragma once
+#pragma once
 
 #include "..\Base.h"
 #include "DynamicStorage.h"
+#include "Relation.h"
 
 namespace Sets
 {
-	template<typename T>
-	class Subset
+	template<typename TInput, typename TOutput>
+	class Surjection
 	{
 		class Element
 		{
-			friend class Subset;
+			friend class Surjection;
 
 			Integer _nextElementOffset;
-			Integer _simplifiedValue;
-			T _value;
+			Integer _simplifiedInput;
+			Relation<TInput, TOutput> _relation;
 		};
 
 		DynamicStorage<Element> _storage;
@@ -23,7 +24,7 @@ namespace Sets
 		Integer _usedElementCount;
 		Integer _count;
 
-		void IncreaseCapacity(Integer const capacity)
+		void IncreaseCapacity(Integer capacity)
 		{
 			Integer previousCapacity;
 
@@ -34,7 +35,7 @@ namespace Sets
 			memset(_chainStartOffsets, 0x0I32, _storage.GetCapacity() * sizeof(Integer));
 			for (Integer elementOffset = 0x0I64; elementOffset != previousCapacity; elementOffset++)
 			{
-				Integer chainOffset = _storage[elementOffset]._simplifiedValue % capacity;
+				Integer chainOffset = _storage[elementOffset]._simplifiedInput % capacity;
 				_storage[elementOffset]._nextElementOffset = _chainStartOffsets[chainOffset] - 0x1I64;
 				_chainStartOffsets[chainOffset] = elementOffset + 0x1I64;
 			}
@@ -44,21 +45,21 @@ namespace Sets
 
 		class Enumerator
 		{
-			friend class Subset;
+			friend class Surjection;
 
-			Subset<T> const& _subset;
+			Surjection<TInput, TOutput> const& _surjection;
 			Integer _offset;
 			bool _canContinue;
 
-			explicit Enumerator(Subset<T> const& subset) : _subset(subset), _offset(0x0I64), _canContinue(true) { SetValid(); }
+			explicit Enumerator(Surjection<TInput, TOutput> const& surjection) : _surjection(surjection), _offset(0x0I64), _canContinue(true) { SetValid(); }
 
 			void SetValid()
 			{
 				for (; ; _offset++)
 				{
-					if (_offset != _subset._usedElementCount)
+					if (_offset != _surjection._usedElementCount)
 					{
-						if (_subset._storage[_offset]._simplifiedValue != -0x1I64)
+						if (_surjection._storage[_offset]._simplifiedInput != -0x1I64)
 							break;
 						else
 							continue;
@@ -74,7 +75,7 @@ namespace Sets
 		public:
 
 			bool operator!() const { return _canContinue; }
-			T const& operator*() const { return _subset._storage[_offset]._value; }
+			Relation<TInput, TOutput> const& operator*() const { return _surjection._storage[_offset]._relation; }
 			Enumerator& operator++()
 			{
 				_offset++;
@@ -83,36 +84,36 @@ namespace Sets
 			}
 		};
 
-		Subset(Integer const capacity) : _storage(capacity), _chainStartOffsets(new Integer[capacity]), _freeElementOffset(-0x1I64), _usedElementCount(0x0I64), _count(0x0I64) { }
-		~Subset() { delete _chainStartOffsets; }
+		Surjection(Integer const capacity) : _storage(capacity), _chainStartOffsets(new Integer[capacity]), _freeElementOffset(-0x1I64), _usedElementCount(0x0I64), _count(0x0I64) { }
+		~Surjection() { delete _chainStartOffsets; }
 
 		Integer GetCount() const { return _count; }
-		bool TryGetAddress(T const value, Integer& address) const
+		bool TryGetAddress(TInput const input, Integer& address) const
 		{
-			Integer simplifiedValue;
+			Integer simplifiedInput;
 
-			simplifiedValue = Simplify(value);
-			for (Integer elementOffset = _chainStartOffsets[simplifiedValue % _storage.GetCapacity()] - 0x1I64; elementOffset != -0x1I64; elementOffset = _storage[elementOffset]._nextElementOffset)
+			simplifiedInput = Simplify(input);
+			for (Integer elementOffset = _chainStartOffsets[simplifiedInput % _storage.GetCapacity()] - 0x1I64; elementOffset != -0x1I64; elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementOffset]._value)
+				if (input != _storage[elementOffset]._relation.GetInput())
 					continue;
 				address = elementOffset;
 				return true;
 			}
 			return false;
 		}
-		bool ContainsAt(Integer const address) const { return address >= 0x0I64 && address < _usedElementCount&& _storage[address]._simplifiedValue != -0x1I64; }
-		bool TryGetAt(Integer const address, T& value) const
+		bool ContainsAt(Integer const address) const { return address >= 0x0I64 && address < _usedElementCount&& _storage[address]._simplifiedInput != -0x1I64; }
+		bool TryGetAt(Integer const address, Relation<TInput, TOutput>& relation) const
 		{
-			if (address < 0x0I64 || address >= _usedElementCount || _storage[address]._simplifiedValue == -0x1I64)
+			if (address < 0x0I64 || address >= _usedElementCount || _storage[address]._simplifiedInput == -0x1I64)
 				return false;
-			value = _storage[address]._value;
+			relation = _storage[address]._relation;
 			return true;
 		}
 		Enumerator GetEnumerator() const { return Enumerator(*this); }
-		bool TryAdd(T const value, Integer& address)
+		bool TryAdd(Relation<TInput, TOutput> relation, Integer& address)
 		{
-			Integer simplifiedValue;
+			Integer simplifiedInput;
 			Integer chainOffset;
 			Integer elementOffset;
 
@@ -123,11 +124,11 @@ namespace Sets
 			}
 			if (_count > _storage.GetCapacity())
 				IncreaseCapacity(GetEnoughCapacity(_storage.GetCapacity(), _count));
-			simplifiedValue = Simplify(value);
-			chainOffset = simplifiedValue % _storage.GetCapacity();
+			simplifiedInput = Simplify(relation.GetInput());
+			chainOffset = simplifiedInput % _storage.GetCapacity();
 			for (elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; elementOffset != -0x1I64; elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementOffset]._value)
+				if (relation.GetInput() != _storage[elementOffset]._relation.GetInput())
 					continue;
 				_count--;
 				return false;
@@ -137,54 +138,54 @@ namespace Sets
 			else
 				elementOffset = _usedElementCount++;
 			_storage[elementOffset]._nextElementOffset = _chainStartOffsets[chainOffset] - 0x1I64;
-			_storage[elementOffset]._simplifiedValue = simplifiedValue;
-			_storage[elementOffset]._value = value;
+			_storage[elementOffset]._simplifiedInput = simplifiedInput;
+			_storage[elementOffset]._relation = relation;
 			_chainStartOffsets[chainOffset] = elementOffset + 0x1I64;
 			address = elementOffset;
 			return true;
 		}
-		bool TryRemove(T const value)
+		bool TryRemove(TInput const input)
 		{
 			Integer chainOffset;
 			Integer lastElementOffset;
 
-			chainOffset = Simplify(value) % _storage.GetCapacity();
+			chainOffset = Simplify(input) % _storage.GetCapacity();
 			lastElementOffset = -0x1I64;
 			for (Integer elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; elementOffset != -0x1I64; lastElementOffset = elementOffset, elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementOffset]._value)
+				if (input != _storage[elementOffset]._relation.GetInput())
 					continue;
 				if (lastElementOffset == -0x1I64)
 					_chainStartOffsets[chainOffset] = _storage[elementOffset]._nextElementOffset + 0x1I64;
 				else
 					_storage[lastElementOffset]._nextElementOffset = _storage[elementOffset]._nextElementOffset;
 				_storage[elementOffset]._nextElementOffset = _freeElementOffset;
-				_storage[elementOffset]._simplifiedValue = -0x1I64;
+				_storage[elementOffset]._simplifiedInput = -0x1I64;
 				_freeElementOffset = elementOffset;
 				_count--;
 				return true;
 			}
 			return false;
 		}
-		bool TryRemoveAt(Integer const address, T& value)
+		bool TryRemoveAt(Integer const address, Relation<TInput, TOutput>& relation)
 		{
-			Integer simplifiedValue;
+			Integer simplifiedInput;
 
-			if (address < 0x0I64 || address >= _usedElementCount || (simplifiedValue = _storage[address]._simplifiedValue) == -0x1I64)
+			if (address < 0x0I64 || address >= _usedElementCount || (simplifiedInput = _storage[address]._simplifiedInput) == -0x1I64)
 				return false;
-			value = _storage[address]._value;
-			Integer chainOffset = simplifiedValue % _storage.GetCapacity();
+			relation = _storage[address]._relation;
+			Integer chainOffset = simplifiedInput % _storage.GetCapacity();
 			Integer lastElementOffset = -0x1I64;
 			for (Integer elementOffset = _chainStartOffsets[chainOffset] - 0x1I64; ; lastElementOffset = elementOffset, elementOffset = _storage[elementOffset]._nextElementOffset)
 			{
-				if (value != _storage[elementOffset]._value)
+				if (relation.GetInput() != _storage[elementOffset]._relation.GetInput())
 					continue;
 				if (lastElementOffset == -0x1I64)
 					_chainStartOffsets[chainOffset] = _storage[elementOffset]._nextElementOffset + 0x1I64;
 				else
 					_storage[lastElementOffset]._nextElementOffset = _storage[elementOffset]._nextElementOffset;
 				_storage[elementOffset]._nextElementOffset = _freeElementOffset;
-				_storage[elementOffset]._simplifiedValue = -0x1I64;
+				_storage[elementOffset]._simplifiedInput = -0x1I64;
 				_freeElementOffset = elementOffset;
 				_count--;
 				return true;

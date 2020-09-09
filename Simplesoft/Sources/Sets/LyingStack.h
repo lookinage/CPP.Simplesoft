@@ -76,7 +76,7 @@ namespace Sets
 		public:
 
 			bool operator!() const { return _offset != _edge; }
-			T operator*() const { return _stack._elements[_offset]; }
+			T const& operator*() const { return _stack._elements[_offset]; }
 			AscendingEnumerator& operator++()
 			{
 				if (++_offset == _stack._capacity)
@@ -97,7 +97,7 @@ namespace Sets
 		public:
 
 			bool operator!() const { return _offset != _edge; }
-			T operator*() const { return _stack._elements[_offset]; }
+			T const& operator*() const { return _stack._elements[_offset]; }
 			DescendingEnumerator& operator++()
 			{
 				if (--_offset < 0x0I64)
@@ -106,8 +106,6 @@ namespace Sets
 			}
 		};
 
-		LyingStack(LyingStack& instance) = delete;
-		LyingStack(LyingStack&& instance) = delete;
 		explicit LyingStack(Integer const capacity) : _elements(new T[capacity]), _capacity(capacity), _startOffset(0x0I64), _endOffset(0x0I64), _count(0x0I64) { }
 		~LyingStack() { delete _elements; }
 

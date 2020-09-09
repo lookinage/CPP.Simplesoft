@@ -155,12 +155,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Sets\Relation.h" />
     <ClInclude Include="Sources\Base.h" />
     <ClInclude Include="Sources\Sets\DynamicStorage.h" />
     <ClInclude Include="Sources\Sets\LyingStack.h" />
     <ClInclude Include="Sources\Sets\StandingStack.h" />
     <ClInclude Include="Sources\Sets\Subset.h" />
     <ClInclude Include="Sources\Sets\StaticStorage.h" />
+    <ClInclude Include="Sources\Sets\Surjection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Base.cpp" />

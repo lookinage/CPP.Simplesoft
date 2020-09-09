@@ -5,6 +5,7 @@
 #include <Sets\StandingStack.h>
 #include <Sets\LyingStack.h>
 #include <Sets\Subset.h>
+#include <Sets\Surjection.h>
 
 struct A
 {
@@ -96,8 +97,23 @@ void TestSubset()
 		std::cout << *enumerator;
 	}
 }
+void TestSurjection()
+{
+	Sets::Surjection<__int32, __int32> surjection(0x0I64);
+
+	Integer address;
+	surjection.TryAdd({ 1, 2 }, address);
+	surjection.TryAdd({ 3, 4 }, address);
+	surjection.TryAdd({ 2, 3 }, address);
+	surjection.TryRemove(1);
+
+	for (Sets::Surjection<__int32, __int32>::Enumerator enumerator = surjection.GetEnumerator(); !enumerator; ++enumerator)
+	{
+		std::cout << (*enumerator).GetInput() << ' ' << (*enumerator).GetOutput() << ' ';
+	}
+}
 
 __int32 main()
 {
-	TestSubset();
+	TestSurjection();
 }

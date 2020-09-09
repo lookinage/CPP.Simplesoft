@@ -26,7 +26,7 @@ namespace Sets
 		public:
 
 			bool operator!() const { return _offset != _edge; }
-			T operator*() const { return _stack._storage[_offset]; }
+			T const& operator*() const { return _stack._storage[_offset]; }
 			AscendingEnumerator& operator++()
 			{
 				_offset++;
@@ -46,7 +46,7 @@ namespace Sets
 		public:
 
 			bool operator!() const { return _offset != _edge; }
-			T operator*() const { return _stack._storage[_offset]; }
+			T const& operator*() const { return _stack._storage[_offset]; }
 			DescendingEnumerator& operator++()
 			{
 				_offset--;
@@ -54,8 +54,6 @@ namespace Sets
 			}
 		};
 
-		StandingStack(StandingStack const&) = delete;
-		StandingStack(StandingStack&&) = delete;
 		explicit StandingStack(Integer const capacity) : _storage(capacity), _count(0x0I64) { }
 
 		Integer GetCount() const { return _count; }
