@@ -21,7 +21,17 @@ namespace Sets
 			Integer const _edge;
 			Integer _offset;
 
-			explicit AscendingEnumerator(StandingStack const& stack, Integer const edge, Integer const offset) : _stack(stack), _edge(edge), _offset(offset) { }
+			explicit AscendingEnumerator
+			(
+				StandingStack const& stack,
+				Integer const edge,
+				Integer const offset
+			) 
+				: 
+				_stack(stack), 
+				_edge(edge), 
+				_offset(offset) 
+			{ }
 
 		public:
 
@@ -59,44 +69,44 @@ namespace Sets
 		Integer GetCount() const { return _count; }
 		T GetAt(Integer const offset) const { return _storage[offset]; }
 		AscendingEnumerator GetAscendingEnumerator(Integer const offset, Integer const edge) const
-		{ 
+		{
 			return AscendingEnumerator
 			(
-				*this, 
-				edge, 
+				*this,
+				edge,
 				offset
 			);
 		}
 		AscendingEnumerator GetAscendingEnumerator() const
-		{ 
+		{
 			return GetAscendingEnumerator
 			(
-				0x0I64, 
+				0x0I64,
 				_count
-			); 
+			);
 		}
 		DescendingEnumerator GetDescendingEnumerator(Integer const offset, Integer const edge) const
-		{ 
+		{
 			return DescendingEnumerator
 			(
-				*this, 
-				edge, 
+				*this,
+				edge,
 				offset
-			); 
+			);
 		}
 		DescendingEnumerator GetDescendingEnumerator() const
-		{ 
+		{
 			return GetDescendingEnumerator
 			(
-				_count - 0x1I64, 
+				_count - 0x1I64,
 				-0x1I64
-			); 
+			);
 		}
 		bool TryAdd(T const value)
 		{
 			Integer offset;
 
-			if ((offset = _count++) != MaxIntegerValue)
+			if ((offset = _count++) != MaxUnsignedInteger)
 			{
 				if (_count <= _storage.GetCapacity())
 				{
@@ -104,7 +114,11 @@ namespace Sets
 					_storage[offset] = value;
 					return true;
 				}
-				_storage.SetCapacity(GetEnoughCapacity(_storage.GetCapacity(), _count));
+				_storage.SetCapacity(GetEnoughCapacity
+				(
+					_storage.GetCapacity(),
+					_count
+				));
 				goto Adding;
 			}
 			_count--;

@@ -2,5 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\BaseTest.cpp" />
+    <ClCompile Include="Sources\SetsTests\StaticStorageTest.cpp" />
+    <ClCompile Include="Sources\SetsTests\DynamicStorageTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\BaseTest.h" />
+    <ClInclude Include="Sources\SetsTests\StaticStorageTest.h" />
+    <ClInclude Include="Sources\SetsTests\DynamicStorageTest.h" />
   </ItemGroup>
 </Project>

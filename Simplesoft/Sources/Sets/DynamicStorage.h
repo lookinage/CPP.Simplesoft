@@ -13,12 +13,10 @@ namespace Sets
 
 	public:
 
-		explicit DynamicStorage(const Integer count) : _capacity(count), _elements(new T[count]) { }
-		~DynamicStorage() { delete _elements; }
+		explicit DynamicStorage(const Integer capacity) : _capacity(capacity), _elements(new T[capacity]) { }
+		~DynamicStorage( ) { delete _elements; }
 
-		Integer GetCapacity() const { return _capacity; }
-		T TryGetAt(Integer const offset) const { return _elements[offset]; }
-		void Set(Integer const offset, T const value) { _elements[offset] = value; }
+		Integer GetCapacity( ) const { return _capacity; }
 		void SetCapacity(Integer const capacity)
 		{
 			T* elements;
@@ -44,7 +42,14 @@ namespace Sets
 	};
 
 	template<typename T>
-	bool operator==(DynamicStorage<T> const& left, DynamicStorage<T> const& right) { return left._elements == right._elements; };
+	bool operator==(DynamicStorage<T> const& left, DynamicStorage<T> const& right)
+	{
+		bool result = left._elements == right._elements;
+		return result;
+	};
 	template<typename T>
-	bool operator!=(DynamicStorage<T> const& left, DynamicStorage<T> const& right) { return left._elements != right._elements; };
+	bool operator!=(DynamicStorage<T> const& left, DynamicStorage<T> const& right)
+	{
+		return left._elements != right._elements;
+	};
 }

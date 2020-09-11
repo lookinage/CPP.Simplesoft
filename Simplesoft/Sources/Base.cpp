@@ -1,18 +1,23 @@
 #include "Base.h"
 
-Integer GetEnoughCapacity(Integer capacity, Integer const count)
+Integer GetEnoughCapacity
+(
+	Integer const capacity, 
+	Integer const count
+)
 {
-	if (capacity == 0x0I64)
-		capacity = 0x1I64;
+	Integer result;
+
+	result = capacity == Zero ? One : capacity;
 	do
 	{
-		capacity <<= 0x1I64;
-		if (capacity < 0x0I64)
+		result += result;
+		if (result < Zero)
 		{
-			capacity = MaxIntegerValue;
+			result = MaxUnsignedInteger;
 			break;
 		}
 	}
-	while (capacity < count);
-	return capacity;
+	while (result < count);
+	return result;
 }

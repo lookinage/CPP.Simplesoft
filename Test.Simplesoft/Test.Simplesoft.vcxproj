@@ -154,12 +154,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\SetsTests\DynamicStorageTest.cpp" />
+    <ClCompile Include="Sources\BaseTest.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\SetsTests\StaticStorageTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Simplesoft\Simplesoft.vcxproj">
       <Project>{e5d7fa4b-a039-4c58-9ea4-a47b2c1b5fc2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\SetsTests\DynamicStorageTest.h" />
+    <ClInclude Include="Sources\BaseTest.h" />
+    <ClInclude Include="Sources\SetsTests\StaticStorageTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,41 +1,52 @@
 #pragma once
 
+#include "..\Base.h"
+
 namespace Sets
 {
-	template<typename T, Integer Count>
+	template<typename T, Integer Capacity>
 	struct StaticStorage
 	{
-		T _elements[Count];
+		T _elements[Capacity];
 
 	public:
 
-		const Integer GetCount() const { return Count; }
-		T TryGetAt(Integer const offset) { return _elements[offset]; }
-		void Set(Integer const offset, T const value) { _elements[offset] = value; }
+		StaticStorage( ) :
+			_elements( )
+		{ }
 
-		T& operator[](Integer const offset) { return _elements[offset]; }
+		const Integer GetCapacity( )
+			const
+		{
+			return Capacity;
+		}
+
+		T& operator[](Integer const offset)
+		{
+			return _elements[offset];
+		}
 	};
 
-	template<typename T, Integer Count>
-	bool operator==(StaticStorage<T, Count> const& left, StaticStorage<T, Count> const& right)
+	template<typename T, Integer Capacity>
+	bool operator==(StaticStorage<T, Capacity> const& left, StaticStorage<T, Capacity> const& right)
 	{
 		__int32 compareResult = memcmp
 		(
 			&left,
 			&right,
-			sizeof(T) * Count
+			sizeof(T) * Capacity
 		);
-		return compareResult == 0x0I64;
+		return compareResult == Zero;
 	};
-	template<typename T, Integer Count>
-	bool operator!=(StaticStorage<T, Count> const& left, StaticStorage<T, Count> const& right)
+	template<typename T, Integer Capacity>
+	bool operator!=(StaticStorage<T, Capacity> const& left, StaticStorage<T, Capacity> const& right)
 	{
 		__int32 compareResult = memcmp
 		(
 			&left,
 			&right,
-			sizeof(T) * Count
+			sizeof(T) * Capacity
 		);
-		return compareResult != 0x0I64;
+		return compareResult != Zero;
 	};
 }

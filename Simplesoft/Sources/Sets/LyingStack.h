@@ -147,7 +147,7 @@ namespace Sets
 		}
 		bool TryAddLast(T const value)
 		{
-			if (_count++ != MaxIntegerValue)
+			if (_count++ != MaxUnsignedInteger)
 			{
 				if (_count <= _capacity)
 				{
@@ -165,7 +165,7 @@ namespace Sets
 		}
 		bool TryAddFirst(T const value)
 		{
-			if (_count++ != MaxIntegerValue)
+			if (_count++ != MaxUnsignedInteger)
 			{
 				if (_count <= _capacity)
 				{

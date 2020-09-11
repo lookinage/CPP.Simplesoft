@@ -116,7 +116,7 @@ namespace Sets
 			Integer chainOffset;
 			Integer elementOffset;
 
-			if (_count++ == MaxIntegerValue)
+			if (_count++ == MaxUnsignedInteger)
 			{
 				_count--;
 				return false;
